@@ -1,0 +1,50 @@
+[
+   {
+      "MMSI":357787000,
+      "MMSI_String":357787000,
+      "ShipName":"UNI PATRIOT         ",
+      "latitude":10.757568333333333,
+      "longitude":106.79384,
+      "time_utc":"2023-08-30 04:05:12.187664234 +0000 UTC"
+   },
+   {
+      "MMSI":525100633,
+      "MMSI_String":525100633,
+      "ShipName":"SEIRA",
+      "latitude":-5.932788333333334,
+      "longitude":105.97618166666666,
+      "time_utc":"2023-08-30 04:05:12.348165849 +0000 UTC"
+   },
+   {
+      "MMSI":563080370,
+      "MMSI_String":563080370,
+      "ShipName":"PENGUIN REFLECTION  ",
+      "latitude":1.223018333333333,
+      "longitude":103.77428666666667,
+      "time_utc":"2023-08-30 04:05:12.355901493 +0000 UTC"
+   },
+   {
+      "MMSI":574005410,
+      "MMSI_String":574005410,
+      "ShipName":"PRIME               ",
+      "latitude":20.84365,
+      "longitude":106.76821666666666,
+      "time_utc":"2023-08-30 04:05:12.107606542 +0000 UTC"
+   },
+   {
+      "MMSI":563336000,
+      "MMSI_String":563336000,
+      "ShipName":"HY JADE             ",
+      "latitude":1.302853333333333,
+      "longitude":103.95065833333334,
+      "time_utc":"2023-08-30 04:05:12.060131037 +0000 UTC"
+   },
+   {
+      "MMSI":533132714,
+      "MMSI_String":533132714,
+      "ShipName":"EAGLE VELLORE       ",
+      "latitude":1.153598333333333,
+      "longitude":103.707165,
+      "time_utc":"2023-08-30 04:05:12.049325798 +0000 UTC"
+   }
+]
