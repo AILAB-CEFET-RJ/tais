@@ -1,14 +1,13 @@
 import asyncio
 import websockets
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-
 # Define the SQLAlchemy database connection URL
-db_url = ''
+db_url = 'postgresql://username:password@host:port/database'
 
 # Create an SQLAlchemy engine
 engine = create_engine(db_url)
@@ -17,8 +16,6 @@ engine = create_engine(db_url)
 Base = declarative_base()
 
 # Define the AISData model
-
-
 class AISData(Base):
     __tablename__ = 'ais_data'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -28,7 +25,6 @@ class AISData(Base):
     ship_name = Column(String)
     time_utc = Column(DateTime)
 
-
 # Create the table if it doesn't exist
 Base.metadata.create_all(engine)
 
@@ -36,15 +32,14 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-api_key = ''
-
+api_key = 'api_key'
 
 async def connect_ais_stream():
 
     # Connect to the AIS WebSocket stream
     async with websockets.connect("wss://stream.aisstream.io/v0/stream") as websocket:
         subscribe_message = {"APIKey": api_key,
-                             "BoundingBoxes": [[[-11, 178], [30, 74]]]}
+                             "BoundingBoxes": [[[-56.0, -79.0], [12.0, -35.0]]]}
 
         subscribe_message_json = json.dumps(subscribe_message)
         await websocket.send(subscribe_message_json)
@@ -65,23 +60,15 @@ async def connect_ais_stream():
                 # Original timestamp string
                 timestamp_string = message['MetaData']['time_utc']
 
-                # Convert the input string to a datetime object
-                # Remove the fractional seconds and ' UTC' from the input string
-                formatted_input = timestamp_string.split('.')[0].strip()
-
-                # Convert the modified input string to a datetime object
-                input_datetime = datetime.strptime(
-                    formatted_input, '%Y-%m-%d %H:%M:%S')
-
-                # Format it as SQL datetime
-                sql_datetime = input_datetime.strftime('%Y-%m-%d %H:%M:%S')
+                # Format the time to database
+                formatted_time_utc = timestamp_string.split('.')[0].strip()
 
                 # Create an instance of AISData and add it to the session
                 ais_data = AISData(
-                    ship_id=ship_id, latitude=latitude, longitude=longitude, ship_name=ship_name, time_utc=sql_datetime)
+                    ship_id=ship_id, latitude=latitude, longitude=longitude, ship_name=ship_name, time_utc=formatted_time_utc)
                 session.add(ais_data)
 
-                print("Creating new object")
+                print(f"Creating new document in data base: \nship_id={ship_id}, latitude={latitude}, longitude={longitude}, ship_name={ship_name}, time_utc={formatted_time_utc}")
 
                 # Commit the changes to the database
                 session.commit()
