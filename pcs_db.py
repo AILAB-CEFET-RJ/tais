@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 # Define the SQLAlchemy database connection URL
-db_url = 'postgresql://username:password@host:port/database'
+db_url = 'postgresql://tais:tais%40dal#31#7@localhost:5432/tais'
 
 # Create an SQLAlchemy engine
 engine = create_engine(db_url)
@@ -16,6 +16,8 @@ engine = create_engine(db_url)
 Base = declarative_base()
 
 # Define the AISData model
+
+
 class AISData(Base):
     __tablename__ = 'ais_data'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -25,6 +27,7 @@ class AISData(Base):
     ship_name = Column(String)
     time_utc = Column(DateTime)
 
+
 # Create the table if it doesn't exist
 Base.metadata.create_all(engine)
 
@@ -32,7 +35,8 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-api_key = 'api_key'
+api_key = ''
+
 
 async def connect_ais_stream():
 
@@ -68,7 +72,8 @@ async def connect_ais_stream():
                     ship_id=ship_id, latitude=latitude, longitude=longitude, ship_name=ship_name, time_utc=formatted_time_utc)
                 session.add(ais_data)
 
-                print(f"Creating new document in data base: \nship_id={ship_id}, latitude={latitude}, longitude={longitude}, ship_name={ship_name}, time_utc={formatted_time_utc}")
+                print(
+                    f"Creating new document in data base: \nship_id={ship_id}, latitude={latitude}, longitude={longitude}, ship_name={ship_name}, time_utc={formatted_time_utc}")
 
                 # Commit the changes to the database
                 session.commit()
