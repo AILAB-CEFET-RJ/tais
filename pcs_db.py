@@ -5,9 +5,10 @@ from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from websockets.exceptions import ConnectionClosedError
 
 # Define the SQLAlchemy database connection URL
-db_url = 'postgresql://tais:tais%40dal#31#7@localhost:5432/tais'
+db_url = ''
 
 # Create an SQLAlchemy engine
 engine = create_engine(db_url)
@@ -49,34 +50,39 @@ async def connect_ais_stream():
         await websocket.send(subscribe_message_json)
 
         # Start receiving and processing AIS messages
-        async for message_json in websocket:
-            message = json.loads(message_json)
-            message_type = message["MessageType"]
+        try:
+            async for message_json in websocket:
+                message = json.loads(message_json)
+                message_type = message["MessageType"]
 
-            if message_type == "PositionReport":
-                ais_message = message['Message']['PositionReport']
-                ship_id = ais_message['UserID']
-                latitude = ais_message['Latitude']
-                longitude = ais_message['Longitude']
-                ship_name = message['MetaData']['ShipName']
-                ship_name = ship_name.replace(" ", "")
+                if message_type == "PositionReport":
+                    ais_message = message['Message']['PositionReport']
+                    ship_id = ais_message['UserID']
+                    latitude = ais_message['Latitude']
+                    longitude = ais_message['Longitude']
+                    ship_name = message['MetaData']['ShipName']
+                    ship_name = ship_name.replace(" ", "")
 
-                # Original timestamp string
-                timestamp_string = message['MetaData']['time_utc']
+                    # Original timestamp string
+                    timestamp_string = message['MetaData']['time_utc']
 
-                # Format the time to database
-                formatted_time_utc = timestamp_string.split('.')[0].strip()
+                    # Format the time to database
+                    formatted_time_utc = timestamp_string.split('.')[0].strip()
 
-                # Create an instance of AISData and add it to the session
-                ais_data = AISData(
-                    ship_id=ship_id, latitude=latitude, longitude=longitude, ship_name=ship_name, time_utc=formatted_time_utc)
-                session.add(ais_data)
+                    # Create an instance of AISData and add it to the session
+                    ais_data = AISData(
+                        ship_id=ship_id, latitude=latitude, longitude=longitude, ship_name=ship_name, time_utc=formatted_time_utc)
+                    session.add(ais_data)
 
-                print(
-                    f"Creating new document in data base: \nship_id={ship_id}, latitude={latitude}, longitude={longitude}, ship_name={ship_name}, time_utc={formatted_time_utc}")
+                    print(
+                        f"ship_id={ship_id}, latitude={latitude}, longitude={longitude}, ship_name={ship_name}, time_utc={formatted_time_utc}")
 
-                # Commit the changes to the database
-                session.commit()
+                    # Commit the changes to the database
+                    session.commit()
+
+                    await websocket.ping()
+        except ConnectionClosedError as e:
+            print(f"Connection closed: {e}")
 
 
 async def main():
