@@ -1,0 +1,7 @@
+Flask
+numpy
+pandas
+folium
+geopy
+sqlalchemy
+psycopg2
