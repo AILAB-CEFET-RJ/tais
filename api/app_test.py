@@ -11,7 +11,7 @@ db_username = 'postgres'
 db_password = 'postgres'
 db_hostname = 'localhost'
 db_port = '5432'
-db_name = 'pcs'
+db_name = 'postgres'
 
 # Create a connection string using variables
 db_url = f'postgresql://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_name}'
@@ -42,8 +42,6 @@ app = Flask(__name__)
 @app.route('/api/data', methods=['GET'])
 def get_data():
     # Parse query parameters
-    latitude = float(request.args.get('latitude', default=-23.968076666666665))
-    longitude = float(request.args.get('longitude', default=-46.297839999999994))
     start_time_str = request.args.get('start_time', default='2023-01-01 00:00:00')
     end_time_str = request.args.get('end_time', default='2023-12-31 23:59:59')
 
@@ -56,14 +54,11 @@ def get_data():
 
     # Query latitude, longitude, and ship_id based on the circular range and time range
     query = (session.query(AISData.latitude, AISData.longitude, AISData.ship_id, AISData.ship_name)
-         .filter(AISData.latitude == latitude)
-         .filter(AISData.longitude == longitude)
          .filter(AISData.time_utc >= start_time)
          .filter(AISData.time_utc <= end_time)
          .distinct())
 
     result = query.all()
-
     # Close the session
     session.close()
 
