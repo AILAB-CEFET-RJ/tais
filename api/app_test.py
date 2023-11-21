@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, MetaData, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -36,8 +37,7 @@ class AISData(Base):
 Session = sessionmaker(bind=engine)
 
 app = Flask(__name__)
-
-
+CORS(app)
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
@@ -59,6 +59,7 @@ def get_data():
          .distinct())
 
     result = query.all()
+
     # Close the session
     session.close()
 

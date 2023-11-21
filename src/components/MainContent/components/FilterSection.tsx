@@ -1,21 +1,22 @@
 import { Box, Button, Drawer, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import ShipType from "../../../types/ships";
+import {GetShipsResponse, ShipType} from "../../../types";
 import { BiFilter } from "react-icons/bi";
-import vesselReport from "../../../constants/ais_data.json";
 import { useMap } from "react-leaflet";
 
 interface FilterSectionProps {
   setLong: any;
   setLat: any;
   defaultZoom: number;
+  vesselReport: GetShipsResponse[] | undefined
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({
   setLong,
   setLat,
   defaultZoom,
+  vesselReport
 }) => {
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const { handleSubmit, control, reset } = useForm<ShipType>();
@@ -38,9 +39,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   };
 
   const filterAction = (ship_id = "", ship_name = "") => {
-    return vesselReport.data[0].find(
+    return vesselReport?.find(
       (vessel: any) =>
-        vessel.ship_id === ship_id || vessel.ship_name === ship_name
+        vessel.ship_id.toString() === ship_id || vessel.ship_name === ship_name
     );
   };
 
