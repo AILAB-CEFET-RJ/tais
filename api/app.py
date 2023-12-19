@@ -7,15 +7,16 @@ from datetime import datetime
 import pandas as pd
 from geopy.distance import geodesic
 from datetime import datetime
+import os
 
-db_username = 'postgres'
-db_password = 'postgres'
-db_hostname = 'localhost'
-db_port = '5432'
-db_name = 'postgres'
+db_username = os.environ.get('DB_USERNAME')
+db_password = os.environ.get('DB_PASSWORD')
+db_hostname = os.environ.get('DB_HOSTNAME')
+db_port = os.environ.get('DB_PORT')
+db_name = os.environ.get('DB_NAME')
 
 # Create a connection string using variables
-db_url = f'postgresql://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_name}'
+db_url = f'postgresql://{db_username}:{db_password}@db:{db_port}/{db_name}'
 
 # Create an SQLAlchemy engine
 engine = create_engine(db_url)

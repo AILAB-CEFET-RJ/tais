@@ -5,4 +5,5 @@ pandas
 folium
 geopy
 sqlalchemy
-psycopg2
+psycopg2-binary
+debugpy

@@ -1,0 +1,8 @@
+version: '3'
+services:
+  web-front:
+    build: .
+    command: run
+    restart: on-failure
+    ports:
+      - 3003:3003
