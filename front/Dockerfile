@@ -8,11 +8,11 @@ RUN npm install --force
 
 COPY ./ .
 
-RUN npm start dev
+RUN npm run build
 
-# EXPOSE 3000
+EXPOSE 3000
 
-# CMD [ "npx", "serve", "build" ]
+CMD [ "npx", "serve", "build" ]
 
 # Bundle static assets with nginx
 # FROM nginx:1.21.0-alpine as production
