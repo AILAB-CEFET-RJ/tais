@@ -5,12 +5,12 @@ WORKDIR /interface
 COPY package*.json ./
 
 RUN npm install --force
-
 COPY ./ .
 
 RUN npm run build
+COPY ./ .
 
-COPY /entrypoint_dev.sh /entrypoint.sh
+COPY /entrypoint_prod.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
 

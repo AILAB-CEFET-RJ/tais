@@ -6,11 +6,13 @@ WORKDIR /interface
 COPY package*.json ./
 
 RUN npm install --force
-
 COPY ./ .
 
 RUN npm run build
-
 COPY ./ .
 
-CMD [ "npm", "run", "start" ]
+COPY entrypoint_dev.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
