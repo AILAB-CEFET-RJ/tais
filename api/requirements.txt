@@ -7,3 +7,5 @@ geopy
 sqlalchemy
 psycopg2-binary
 debugpy
+websockets
+asyncio
