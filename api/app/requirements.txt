@@ -1,0 +1,11 @@
+Flask
+Flask-Cors
+numpy
+pandas
+folium
+geopy
+sqlalchemy
+psycopg2-binary
+debugpy
+websockets
+asyncio

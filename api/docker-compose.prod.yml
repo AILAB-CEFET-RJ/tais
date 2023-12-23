@@ -1,0 +1,10 @@
+version: '3'
+services:
+  web:
+    build: 
+      context: ./app
+      dockerfile: Dockerfile.prod
+    command: run
+    restart: on-failure
+    ports:
+      - 5000:5000

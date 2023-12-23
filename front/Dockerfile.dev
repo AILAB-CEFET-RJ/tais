@@ -1,0 +1,18 @@
+# Construction
+FROM node:14-alpine as builder
+
+WORKDIR /interface
+
+COPY package*.json ./
+
+RUN npm install --force
+COPY ./ .
+
+RUN npm run build
+COPY ./ .
+
+COPY entrypoint_dev.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
