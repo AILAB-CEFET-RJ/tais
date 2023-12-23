@@ -1,0 +1,16 @@
+# Construction
+FROM node:14-alpine as builder
+
+WORKDIR /interface
+
+COPY package*.json ./
+
+RUN npm install --force
+
+COPY ./ .
+
+RUN npm run build
+
+COPY ./ .
+
+CMD [ "npm", "run", "start" ]
