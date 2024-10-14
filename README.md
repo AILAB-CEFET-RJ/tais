@@ -22,28 +22,34 @@ Tool for analisys of AIS data
 
 1. Visualização de Dados Processados ( GET )
  Rota: /api/data
+
  Descrição: Esta funcionalidade permite o acesso a dados processados em formato 
 JSON. Os dados podem ser utilizados para análise, visualização ou integração com 
 outras aplicações.
 
-2. Mapa de Calor (Heatmap) ( GET )
+3. Mapa de Calor (Heatmap) ( GET )
  Rota: /api/heatmap
+
  Descrição: Permite a visualização de um mapa de calor baseado nos dados AIS 
 disponíveis. Este mapa de calor pode ser utilizado para identificar áreas de alta ou 
 baixa densidade de tráfego marítimo.
 
-3. Filtragem por Intervalo de Tempo ( GET )
+4. Filtragem por Intervalo de Tempo ( GET )
  Rota: http://127.0.0.1:5000/timestamp/start/end
+
  Exemplo: http://127.0.0.1:5000/timestamp/2024-08-13%2000:00:00/2024-
 08-13%2000:10:00
+   
  Descrição: Oferece a capacidade de filtrar as observações das embarcações por um 
 intervalo de tempo específico. Essa funcionalidade é útil para análises temporais, 
 permitindo focar em períodos de interesse. O exemplo acima filtra as observações 
 compreendidas no intervalo do dia 13 de agosto entre meia-noite e meia-noite e dez
 
-4. Retorno de Embarcação por Identificador Único ( GET )
+5. Retorno de Embarcação por Identificador Único ( GET )
  Rota: http://127.0.0.1:5000/vessel/<identifier>
+ 
  Exemplo: http://127.0.0.1:5000/vessel/IHS-AIS-232009709
+ 
  Descrição: Esta funcionalidade permite retornar os dados de uma embarcação 
 específica através de seu identificador único. É útil para acessar rapidamente as 
 informações detalhadas de uma embarcação.
