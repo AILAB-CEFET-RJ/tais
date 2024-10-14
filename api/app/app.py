@@ -1,132 +1,196 @@
 import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, MetaData, func
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 import pandas as pd
 from geopy.distance import geodesic
-from datetime import datetime
-
-db_username = os.environ.get('DB_USERNAME')
-db_password = os.environ.get('DB_PASSWORD')
-db_hostname = os.environ.get('DB_HOSTNAME')
-db_port = os.environ.get('DB_PORT')
-db_name = os.environ.get('DB_NAME')
-
-# Create a connection string using variables
-db_url = f'postgresql://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_name}'
-
-# Create an SQLAlchemy engine
-engine = create_engine(db_url)
-
-# Define the SQLAlchemy base model
-Base = declarative_base()
-
-# Define the AISData model
-class AISData(Base):
-    __tablename__ = 'ais_data'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    ship_id = Column(Integer)
-    latitude = Column(Float)
-    longitude = Column(Float)
-    ship_name = Column(String)
-    time_utc = Column(DateTime)
-
-# Create an SQLAlchemy session
-Session = sessionmaker(bind=engine)
+import json
+import numpy as np
+from scipy.stats import gaussian_kde
+import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 CORS(app)
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
-    # Parse query parameters
-    start_time_str = request.args.get('start_time', default='2023-01-01 00:00:00')
-    end_time_str = request.args.get('end_time', default='2023-12-31 23:59:59')
+    # Lista para armazenar os dados combinados
+    combined_data = []
+    dir_path = '../data/cinematicas/' # MUDAR O DIRETÓRIO
 
-    # Convert start_time and end_time to datetime objects
-    start_time = datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
-    end_time = datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S')
+    for path in os.listdir(dir_path):
+        
+        for archive in os.listdir(dir_path + path):
+            newDir = os.path.join(dir_path, path, archive)
+            if os.path.isfile(newDir):
+                with open(newDir, 'r') as file:
+                    # Ler o conteúdo do arquivo JSON e converter para um dicionário Python
+                    data = json.load(file)
+                    # Adicionar os dados do arquivo atual à lista combinada
+                    combined_data.append(data)
 
-    # Create a session
-    session = Session()
+    # Caminho onde você deseja salvar o arquivo JSON combinado
+    output_file = 'tais_data.json'
 
-    # Query latitude, longitude, and ship_id based on the circular range and time range
-    query = (session.query(AISData.latitude, AISData.longitude, AISData.ship_id, AISData.ship_name)
-         .filter(AISData.time_utc >= start_time)
-         .filter(AISData.time_utc <= end_time)
-         .distinct())
+    # Escrever os dados combinados em um único arquivo JSON
+    with open(output_file, 'w') as file:
+        json.dump(combined_data, file, indent=4) 
 
-    result = query.all()
+    print("Arquivo combinado salvo com sucesso!")
+    f = open('tais_data.json')
+    data = json.load(f)
 
-    # Close the session
-    session.close()
-
-    # Convert result to a list of dictionaries
-    data = [{'latitude': row.latitude, 'longitude': row.longitude, 'ship_id': row.ship_id, "ship_name": row.ship_name} for row in result]
-
-    return jsonify(data)
-
-
+    return data
 
 @app.route('/api/heatmap', methods=['GET'])
 def get_heatmap_data():
-    # Parse query parameters
-    start_datetime_str = request.args.get('start_datetime', default='2023-01-01T00:00:00.000Z')
-    end_datetime_str = request.args.get('end_datetime', default='2024-12-31T23:59:59.000Z')
-    grid_size_str = request.args.get('grid_size', default=1.0)
 
-    # Convert start_time and end_time to datetime objects
-    start_datetime = datetime.strptime(start_datetime_str, '%Y-%m-%dT%H:%M:%S.%fZ')
-    end_datetime = datetime.strptime(end_datetime_str, '%Y-%m-%dT%H:%M:%S.%fZ')
-    grid_size = float(grid_size_str)
+    return calculate_heatmap_data()
 
-    return calculate_heatmap_data(start_datetime, end_datetime, grid_size)
+@app.route('/vessel/<string:vessel_id>', methods=['GET'])
+def get_vessel(vessel_id):
+    df = getVessel("sorted_historico_acompanhamentos_24horas.csv", vessel_id)
+    return convert_df_to_json(df)
 
+@app.route('/timestamp/<string:init>/<string:end>', methods=['GET'])
+def filter_timestamp(init, end):
+    df = filter_by_timestamp_range("sorted_historico_acompanhamentos_24horas.csv", init, end)
+    return convert_df_to_json(df)
 
-def km_to_degrees(latitude, kilometers):
-    lat_degrees = geodesic((latitude, 0), (latitude + 1, 0)).kilometers
-    degrees = kilometers / lat_degrees
-    return degrees
+def calculate_heatmap_data():
 
+    f = open('tais_data.json')
+    
+    data = json.load(f)
 
+    f.close()
+    
+    coordenadas_embarcacao = np.empty((0, 2))
 
-def calculate_heatmap_data(start_datetime, end_datetime, grid_size):
-    # Get data from 'ais_data' table and filter by start_datetime and end_datetime
-    session = Session()
-    query = (session.query(AISData.latitude, AISData.longitude, AISData.ship_id, AISData.ship_name, AISData.time_utc)
-        .filter(AISData.time_utc >= start_datetime)
-        .filter(AISData.time_utc <= end_datetime)
-        .distinct())
+    for i in data:
+        latitude = i["cinematica"]["posicao"]["geo"]["lat"]
+        longitude = i["cinematica"]["posicao"]["geo"]["lng"]
+        coordenada = np.array([[latitude, longitude]])
+        coordenadas_embarcacao = np.append(coordenadas_embarcacao, coordenada, axis=0)
+  
+    # Limites das coordenadas (latitude e longitude)
+    lat_min, lat_max = coordenadas_embarcacao[:, 0].min(), coordenadas_embarcacao[:, 0].max()
+    lon_min, lon_max = coordenadas_embarcacao[:, 1].min(), coordenadas_embarcacao[:, 1].max()
 
-    result = query.all()
-    session.close()
+    # Definir a resolução da grade (número de pontos na grade)
+    resolution = 100  # Ajuste conforme necessário
 
-    # Read data from database and convert to DataFrame
-    df = pd.DataFrame(result, columns=['latitude', 'longitude', 'ship_id', 'ship_name', 'time_utc'])
+    # Criar grade de coordenadas
+    lat_grid = np.linspace(lat_min, lat_max, resolution)
+    lon_grid = np.linspace(lon_min, lon_max, resolution)
+    lat_mesh, lon_mesh = np.meshgrid(lat_grid, lon_grid)
+    grid_points = np.vstack([lat_mesh.ravel(), lon_mesh.ravel()])
 
-    # Set grid size in degrees - measure for flat map
-    mean_lat = df['latitude'].mean() 
-    grid_size = km_to_degrees(mean_lat, grid_size)
+    # Calcular KDE
+    kde = gaussian_kde(coordenadas_embarcacao.T, bw_method='silverman')
+    density = kde(grid_points)
+    density = density.reshape(lat_mesh.shape)
 
-    # Calculates the average latitude and longitude between points
-    center_lat, center_lon = df['latitude'].mean(), df['longitude'].mean()
+    # Plotar o mapa de calor
+    plt.figure(figsize=(10, 8))
+    plt.imshow(density.T, origin='lower', extent=[lat_min, lat_max, lon_min, lon_max], cmap='hot', aspect='auto')
+    plt.colorbar(label='Density')
+    plt.title('Mapa de Calor das Rotas da Embarcação')
+    plt.xlabel('Latitude')
+    plt.ylabel('Longitude')
+    plt.show() 
 
-    # Create grids based on latitudes and longitudes
-    df['grid_lat'] = (df['latitude'] // grid_size) * grid_size
-    df['grid_lon'] = (df['longitude'] // grid_size) * grid_size
+    return density
 
-    # Group data by grids and calculate vessel density
-    density_data = df.groupby(['grid_lat', 'grid_lon']).size().reset_index(name='density')
+def filter_by_timestamp_range(sorted_csv_file_path, start_timestamp, end_timestamp):
+    chunksize = 100000
 
-    # Converts data into a list of coordinates along with density for HeatMap
-    heat_data = [[row['grid_lat'], row['grid_lon'], row['density']] for _, row in density_data.iterrows()]
+    chunk_list = []
 
-    return { "center_latitude": center_lat, "center_longitude": center_lon, "heatmap_data": heat_data}
+    start_timestamp = pd.to_datetime(start_timestamp)
+    end_timestamp = pd.to_datetime(end_timestamp)
+    
+    for chunk in pd.read_csv(sorted_csv_file_path, chunksize=chunksize):
 
+        chunk['timestamp'] = pd.to_datetime(chunk['timestamp'], errors='coerce')
+        
+        chunk_filtered = chunk[(chunk['timestamp'] >= start_timestamp) & (chunk['timestamp'] <= end_timestamp)]
+        
+        chunk_list.append(chunk_filtered)
 
+    df_filtered = pd.concat(chunk_list)
+
+    df_filtered['timestamp'] = df_filtered['timestamp'].astype(str)
+
+    return df_filtered
+
+  
+def getVessel(sorted_csv_file_path, vessel_id_filter):
+    chunksize = 100000
+
+    chunk_list = []
+
+    for chunk in pd.read_csv(sorted_csv_file_path, chunksize=chunksize):
+
+        chunk_filtered = chunk[chunk['vesselId'] == vessel_id_filter]
+
+        chunk_list.append(chunk_filtered)
+
+    df_sorted_filtered = pd.concat(chunk_list)
+
+    return df_sorted_filtered
+
+ 
+def sortTimestamp(csv_file_path, sorted_csv_file_path):
+    chunksize = 100000
+
+    chunk_list = []
+    columns_to_load = [0, 1, 2, 5]  # Selecionando as colunas - Exemplo: Primeira, segunda, terceira e sexta colunas
+    column_names = ['vesselId','long', 'lat', 'timestamp']
+    
+    # Iteração sobre os chunks do CSV
+    for chunk in pd.read_csv(csv_file_path,header=None, chunksize=chunksize, usecols=columns_to_load, names=column_names):
+        # Conversão da coluna de timestamp para o tipo datetime
+        chunk['timestamp'] = pd.to_datetime(chunk['timestamp'],format='%Y-%m-%d %H:%M:%S', errors='coerce')
+        
+        # Ordenação final pelo timestamp
+        chunk_sorted = chunk.sort_values(by='timestamp')
+        
+        # Adicionando o chunk ordenado à lista
+        chunk_list.append(chunk_sorted)
+
+    # Concatenação de todos os chunks em um único DataFrame
+    df_sorted = pd.concat(chunk_list)
+
+    # Ordenação final pelo timestamp
+    df_sorted = df_sorted.sort_values(by='timestamp')
+
+    df_sorted.to_csv(sorted_csv_file_path, index=False)
+
+def convert_df_to_json(df):
+    json_data = []
+   
+    for index, row in df.iterrows():
+           
+            entry = {
+                "cinematica": {
+                    "timestamp": row["timestamp"],
+                    "vesselId":row["vesselId"],
+                    "posicao": {
+                        "geo": {
+                            "lat": row["lat"],
+                            "lng": row["long"]
+                        }
+                    }
+                }
+            }
+           
+            # Adicionando a entrada à lista JSON
+            json_data.append(entry)
+
+    # Convertendo a lista para JSON formatado
+    return json.dumps(json_data, indent=4)
+  
 
 if __name__ == '__main__':
     app.run(debug=True)

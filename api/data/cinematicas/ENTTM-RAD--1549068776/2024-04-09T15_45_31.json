@@ -1,0 +1,53 @@
+{
+    "fonte": "ENTTM",
+    "timestamp": "2024-04-09T15:44:52.416Z",
+    "perdido": false,
+    "cinematica": {
+        "timestamp": "2024-04-09T15:44:52.416Z",
+        "posicao": {
+            "geo": {
+                "lat": -22.911261865525873,
+                "lng": -43.145994209680076
+            }
+        },
+        "rumo": {
+            "fundo": 162.110584
+        },
+        "velocidade": {
+            "fundo": 11.655819
+        },
+        "estimarPosicao": false
+    },
+    "identificacao": {
+        "identificador": "-1549068776"
+    },
+    "origem": "RAD",
+    "subOrigem": {
+        "nome": "EN.TTM",
+        "codigo": "en.ttm"
+    },
+    "descricaoOrigem": "EN.TTM",
+    "sensores": {},
+    "classificacao": {
+        "tipoPrioritaria": "VOLUNTARIA",
+        "voluntaria": {
+            "sidc": "100130000016000000000760000000",
+            "ocorrencia": "2024-04-09T15:44:52.416Z"
+        },
+        "sidc": "100130000016000000000760000000",
+        "dimensao": {
+            "descricao": "Marítimos de superfície",
+            "digitoSIDC": "30",
+            "codigo": "MARITIMOS_SUPERFICIE"
+        },
+        "hostilidade": {
+            "descricao": "Desconhecido",
+            "digitoSIDC": "1",
+            "codigo": "DESCONHECIDO"
+        }
+    },
+    "uuid": "ENTTM-RAD--1549068776",
+    "participanteFusao": false,
+    "emOperacao": false,
+    "guid": "26b932e8-aead-487a-8bf5-1eae3a8de55c"
+}
