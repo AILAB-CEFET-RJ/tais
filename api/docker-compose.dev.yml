@@ -8,14 +8,3 @@ services:
     restart: on-failure
     ports:
       - 5000:5000
-    depends_on:
-      - db
-  db:
-    build: ./db
-    image: postgres:latest
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: ais
