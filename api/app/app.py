@@ -12,6 +12,10 @@ import matplotlib.pyplot as plt
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/')
+def home():
+    return "API de análise de trajetórias de embarcações"
+
 @app.route('/api/data', methods=['GET'])
 def get_data():
     # Lista para armazenar os dados combinados
