@@ -24,3 +24,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 front/node_modules*
+
+api/app/historico_acompanhamentos_24horas.csv
+api/app/sorted_historico_acompanhamentos_24horas.csv

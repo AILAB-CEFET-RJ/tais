@@ -54,6 +54,8 @@ def get_heatmap_data():
 @app.route('/vessel/<string:vessel_id>', methods=['GET'])
 def get_vessel(vessel_id):
     df = getVessel("sorted_historico_acompanhamentos_24horas.csv", vessel_id)
+    if isinstance(df, tuple):
+        return df  
     return convert_df_to_json(df)
 
 @app.route('/timestamp/<string:init>/<string:end>', methods=['GET'])
@@ -130,17 +132,27 @@ def filter_by_timestamp_range(sorted_csv_file_path, start_timestamp, end_timesta
 
   
 def getVessel(sorted_csv_file_path, vessel_id_filter):
-    chunksize = 100000
+    if not os.path.exists(sorted_csv_file_path):
+        print(f"Arquivo ordenado {sorted_csv_file_path} não encontrado. Gerando o arquivo ordenado.")
+        sortTimestamp("historico_acompanhamentos_24horas.csv", sorted_csv_file_path)
 
+    chunksize = 100000
     chunk_list = []
 
-    for chunk in pd.read_csv(sorted_csv_file_path, chunksize=chunksize):
+    try:
+        for chunk in pd.read_csv(sorted_csv_file_path, chunksize=chunksize):
+            chunk_filtered = chunk[chunk['vesselId'] == vessel_id_filter]
+            if not chunk_filtered.empty:
+                chunk_list.append(chunk_filtered)
 
-        chunk_filtered = chunk[chunk['vesselId'] == vessel_id_filter]
+        if not chunk_list:
+            return jsonify({"error": f"Embarcação com ID '{vessel_id_filter}' não encontrada."}), 404
 
-        chunk_list.append(chunk_filtered)
+        df_sorted_filtered = pd.concat(chunk_list)
 
-    df_sorted_filtered = pd.concat(chunk_list)
+    except Exception as e:
+        print(f"Erro ao processar o arquivo CSV: {e}")
+        return jsonify({"error": f"Erro ao processar o arquivo CSV: {str(e)}"}), 500
 
     return df_sorted_filtered
 
@@ -149,26 +161,16 @@ def sortTimestamp(csv_file_path, sorted_csv_file_path):
     chunksize = 100000
 
     chunk_list = []
-    columns_to_load = [0, 1, 2, 5]  # Selecionando as colunas - Exemplo: Primeira, segunda, terceira e sexta colunas
+    columns_to_load = [0, 1, 2, 5]
     column_names = ['vesselId','long', 'lat', 'timestamp']
     
-    # Iteração sobre os chunks do CSV
     for chunk in pd.read_csv(csv_file_path,header=None, chunksize=chunksize, usecols=columns_to_load, names=column_names):
-        # Conversão da coluna de timestamp para o tipo datetime
         chunk['timestamp'] = pd.to_datetime(chunk['timestamp'],format='%Y-%m-%d %H:%M:%S', errors='coerce')
-        
-        # Ordenação final pelo timestamp
         chunk_sorted = chunk.sort_values(by='timestamp')
-        
-        # Adicionando o chunk ordenado à lista
         chunk_list.append(chunk_sorted)
 
-    # Concatenação de todos os chunks em um único DataFrame
     df_sorted = pd.concat(chunk_list)
-
-    # Ordenação final pelo timestamp
     df_sorted = df_sorted.sort_values(by='timestamp')
-
     df_sorted.to_csv(sorted_csv_file_path, index=False)
 
 def convert_df_to_json(df):

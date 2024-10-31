@@ -42,8 +42,7 @@ baixa densidade de tráfego marítimo.
 
  Rota: <http://127.0.0.1:5000/timestamp/start/end>
 
- Exemplo: <http://127.0.0.1:5000/timestamp/2024-08-13%2000:00:00/2024->
-08-13%2000:10:00
+ Exemplo: <http://127.0.0.1:5000/timestamp/2024-08-13%2000:00:00/2024-08-13%2000:10:00>
 
  Descrição: Oferece a capacidade de filtrar as observações das embarcações por um
 intervalo de tempo específico. Essa funcionalidade é útil para análises temporais,
