@@ -37,13 +37,9 @@ baixa densidade de tráfego marítimo.
 ## 3. Filtragem por Intervalo de Tempo ( GET )
  Rota: http://127.0.0.1:5000/timestamp/start/end
 
-<<<<<<< HEAD
  Rota: <http://127.0.0.1:5000/timestamp/start/end>
 
  Exemplo: <http://127.0.0.1:5000/timestamp/2024-08-13%2000:00:00/2024-08-13%2000:10:00>
-=======
- Exemplo: http://127.0.0.1:5000/timestamp/2024-08-13%2000:00:00/2024-
->>>>>>> parent of a95ecd3 (cria nova branch)
 08-13%2000:10:00
    
  Descrição: Oferece a capacidade de filtrar as observações das embarcações por um 
