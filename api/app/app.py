@@ -94,7 +94,7 @@ def calculate_heatmap_data():
 
     # Calcular KDE
     kde = gaussian_kde(coordenadas_embarcacao.T, bw_method='silverman')
-    density = kde(grid_points)
+    density:np.ndarray = kde(grid_points)
     density = density.reshape(lat_mesh.shape)
 
     # Plotar o mapa de calor
@@ -104,9 +104,9 @@ def calculate_heatmap_data():
     plt.title('Mapa de Calor das Rotas da Embarcação')
     plt.xlabel('Latitude')
     plt.ylabel('Longitude')
-    plt.show() 
+    plt.show()
 
-    return density
+    return density.tolist() # retornar sem tolist permite visualizar o heatmap, mas causa problemas com o Docker
 
 def filter_by_timestamp_range(sorted_csv_file_path, start_timestamp, end_timestamp):
     chunksize = 100000

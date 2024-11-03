@@ -8,10 +8,6 @@ WORKDIR /app
 COPY . /app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install -r requirements.txt
+RUN apt-get update && pip install -r requirements.txt
 
-COPY /entrypoint_dev.sh /entrypoint.sh
-
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT [ "/entrypoint.sh"]
+EXPOSE 5000

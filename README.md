@@ -7,9 +7,7 @@ Tool for analisys of AIS data
 ### Para executar no ambiente de Desenvolvimento (DEV)
 
 1. Execute o terminal
-2. Vá para o diretório com o comando ```cd api```
-3. Execute o comando ```docker-compose -f .\docker-compose.dev.yml build``` para gerar a imagem da máquina que irá rodar a API
-4. Execute o comando  ```docker-compose -f .\docker-compose.dev.yml up``` para executar o container e rodar a aplicação. Após a execução do comando, deverá aparecer em um Log gerado pelo Flask, a URL em que a aplicação está rodando. Ex: <http://localhost:5000>
+2. Execute o comando ```docker compose up -d --build``` para gerar a imagem da máquina e executar o container que irá rodar a API. Após a execução do comando, deverá aparecer em um Log gerado pelo Flask, a URL em que a aplicação está rodando. Ex: <http://localhost:5000>
 
 ### Alternativamente para rodar a aplicação sem o encapsulamento do Docker
 
@@ -42,7 +40,7 @@ baixa densidade de tráfego marítimo.
 
  Rota: <http://127.0.0.1:5000/timestamp/start/end>
 
- Exemplo: <http://127.0.0.1:5000/timestamp/2024-08-13%2000:00:00/2024-08-13%2000:10:0008-13%2000:10:00
+ Exemplo: <http://127.0.0.1:5000/timestamp/2024-08-13%2000:00:00/2024-08-13%2000:10:0008-13%2000:10:00>
 
  Descrição: Oferece a capacidade de filtrar as observações das embarcações por um
 intervalo de tempo específico. Essa funcionalidade é útil para análises temporais,
