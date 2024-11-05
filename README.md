@@ -30,9 +30,9 @@ Tool for analisys of AIS data
 5. Execute o comando ```python app.py``` para rodar a aplicação flask diretamente
 6. Após a execução do comando, deverá aparecer em um Log gerado pelo Flask, a URL em que a aplicação está rodando. Ex: <http://localhost:5000>
 
-### Instruções sobre a utilização da API
+## Instruções sobre a utilização da API
 
-## 1. Visualização de Dados Processados ( GET )
+### 1. Visualização de Dados Processados ( GET )
 
 - **Rota**: /api/data
 
@@ -40,7 +40,7 @@ Tool for analisys of AIS data
 JSON. Os dados podem ser utilizados para análise, visualização ou integração com
 outras aplicações.
 
-## 2. Mapa de Calor (Heatmap) ( GET )
+### 2. Mapa de Calor (Heatmap) ( GET )
 
 - **Rota**: /api/heatmap
 
@@ -48,9 +48,9 @@ outras aplicações.
 disponíveis. Este mapa de calor pode ser utilizado para identificar áreas de alta ou
 baixa densidade de tráfego marítimo.
 
-## 3. Filtragem por Intervalo de Tempo ( GET )
+### 3. Filtragem por Intervalo de Tempo ( GET )
 
-### Pré-requisitos':'
+#### Pré-requisitos
 
 - Baixe o arquivo ```historico_acompanhamentos_24horas.csv``` e coloque-o no mesmo diretório que o ```app.py```.
 
@@ -60,9 +60,9 @@ baixa densidade de tráfego marítimo.
 
 - **Descrição**: Filtra as observações de embarcações por um intervalo de tempo específico. Essa funcionalidade é útil para análises temporais. No exemplo, as observações entre meia-noite e 00:10 do dia 13 de agosto de 2024 são filtradas.
 
-## 4. Retorno de Embarcação por Identificador Único ( GET )
+### 4. Retorno de Embarcação por Identificador Único ( GET )
 
-### Pré-requisitos':'
+#### Pré-requisitos
 
 - Baixe o arquivo ```historico_acompanhamentos_24horas.csv``` e coloque-o no mesmo diretório que o ```app.py```.
 
