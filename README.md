@@ -50,9 +50,9 @@ baixa densidade de tráfego marítimo.
 
 ### 3. Filtragem por Intervalo de Tempo ( GET )
 
-#### Pré-requisitos
-
 - Baixe o arquivo ```historico_acompanhamentos_24horas.csv``` e coloque-o no mesmo diretório que o ```app.py```.
+
+- Ao rodar a consulta, será gerado um arquivo ordenado chamado ```sorted_historico_acompanhamentos_24horas.csv```.
 
 - **Rota**: <http://127.0.0.1:5000/timestamp/start/end>
 
@@ -62,11 +62,7 @@ baixa densidade de tráfego marítimo.
 
 ### 4. Retorno de Embarcação por Identificador Único ( GET )
 
-#### Pré-requisitos
-
-- Baixe o arquivo ```historico_acompanhamentos_24horas.csv``` e coloque-o no mesmo diretório que o ```app.py```.
-
-- Ao rodar a consulta, será gerado um arquivo ordenado chamado ```sorted_historico_acompanhamentos_24horas.csv```.
+- Para fazer essa consulta, também é necessário baixar o arquivo ```historico_acompanhamentos_24horas.csv``` e colocá-lo no mesmo diretório que o ```app.py```. Se isso não foi feito anteriormente, é necessário realizá-lo agora.
 
 - **Rota**: <http://127.0.0.1:5000/vessel/vessel_id>
 
