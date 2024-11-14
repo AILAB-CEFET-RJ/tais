@@ -16,7 +16,7 @@ Tool for analisys of AIS data
    - [Organização das pastas](#organização-das-pastas)
    - [Processamento dos dados CSV](#processamento-dos-dados-csv)
       - [Campos do CSV](#campos-do-csv)
-   -[Descrição dos campos JSON](#descrição-dos-campos-json)
+   - [Descrição dos campos JSON](#descrição-dos-campos-json)
 4. [Observações](#observações)
 
 ## Execução do Servidor Back-End
