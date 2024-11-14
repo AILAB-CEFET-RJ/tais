@@ -94,9 +94,13 @@ O arquivo ```historico_acompanhamentos_24horas.csv``` possui as seguintes coluna
 | **Coluna**   | **Descrição**                                  |
 |--------------|------------------------------------------------|
 | `vesselId`   | Identificador único da embarcação              |
-| `lat`        | Latitude da posição da embarcação              |
 | `long`       | Longitude da posição da embarcação             |
+| `lat`        | Latitude da posição da embarcação              |
+| `rumo`       | Rumo da embarcação em graus                    |
+| `velocidade` | Velocidade da embarcação em nós                |
 | `timestamp`  | Carimbo de data e hora do evento (em formato `YYYY-MM-DD HH:MM:SS`) |
+| `origem`     | tecnologia ou sistema de monitoramento utilizado (ex: AIS)                     |
+| `subOrigem`  |  Origem adicional ou especificação do tipo de monitoramento (ex: Satelital)      |
 
 ### Descrição dos campos JSON
 
