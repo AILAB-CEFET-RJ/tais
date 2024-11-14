@@ -12,7 +12,12 @@ Tool for analisys of AIS data
    - [Mapa de Calor (Heatmap) (GET)](#2-mapa-de-calor-heatmap--get-)
    - [Filtragem por Intervalo de Tempo (GET)](#3-filtragem-por-intervalo-de-tempo--get-)
    - [Retorno de Embarcação por Identificador Único (GET)](#4-retorno-de-embarcação-por-identificador-único--get-)
-3. [Observações](#observações)
+3.[Formato de dados AIS utilizado no Tais](#formato-de-dados-ais-utilizado-no-tais)
+   - [Organização das pastas](#organização-das-pastas)
+   - [Processamento dos dados CSV](#processamento-dos-dados-csv)
+      - [Campos do CSV](#campos-do-csv)
+   -[Descrição dos campos JSON](#descrição-dos-campos-json)
+4.[Observações](#observações)
 
 ## Execução do Servidor Back-End
 
@@ -69,6 +74,87 @@ baixa densidade de tráfego marítimo.
 - **Exemplo**: <http://127.0.0.1:5000/vessel/IHS-AIS-205188000>
 
 - **Descrição**: Esta funcionalidade permite retornar os dados de uma embarcação específica através de seu identificador único. É útil para acessar rapidamente as informações detalhadas de uma embarcação.
+
+## Formato de dados AIS utilizado no Tais
+
+A aplicação utiliza o formato JSON para representar as informações de rastreamento de embarcações em tempo real. Abaixo está a estrutura de dados AIS processada, que contém dados detalhados sobre a posição das embarcações, incluindo coordenadas geográficas, velocidade, rumo e outros parâmetros relevantes.
+
+### Organização das pastas
+
+Os dados de rastreamento das embarcações são organizados em uma estrutura de pastas dentro do diretório ```data/cinematicas/```. Cada embarcação ou sistema de rastreamento tem uma subpasta específica, que é nomeada com um identificador único. Este identificador pode ser o nome da fonte de dados ou um código único, como ```ENTTM-RAD--<ID>```, ```OPENAV-FUN--<ID>```, ou outros, dependendo da origem dos dados. Dentro de cada subpasta, os dados da embarcação são armazenados em arquivos JSON nomeados com base em um timestamp, representando o momento exato em que os dados foram registrados.
+
+### Processamento dos dados CSV
+
+Além dos dados JSON, a aplicação utiliza o arquivo ```historico_acompanhamentos_24horas.csv```, que contém dados históricos de rastreamento. O CSV é lido e processado, permitindo a consulta de dados filtrados por timestamp ou ID da embarcação. Quando necessário, o arquivo é ordenado para garantir que os dados sejam manipulados de forma cronológica.
+
+#### Campos do CSV
+
+O arquivo ```historico_acompanhamentos_24horas.csv``` possui as seguintes colunas principais:
+
+| **Coluna**   | **Descrição**                                  |
+|--------------|------------------------------------------------|
+| `vesselId`   | Identificador único da embarcação              |
+| `lat`        | Latitude da posição da embarcação              |
+| `long`       | Longitude da posição da embarcação             |
+| `timestamp`  | Carimbo de data e hora do evento (em formato `YYYY-MM-DD HH:MM:SS`) |
+
+### Descrição dos campos JSON
+
+O formato dos dados utilizados segue a seguinte estrutura:
+
+```json
+{
+  "fonte": "<Fonte dos Dados>",
+  "timestamp": "<Carimbo de data e hora do registro>",
+  "perdido": <Booleano que indica se os dados estão perdidos>,
+  "cinematica": {
+    "timestamp": "<Carimbo de data e hora do movimento>",
+    "posicao": {
+      "geo": {
+        "lat": <Latitude da posição da embarcação>,
+        "lng": <Longitude da posição da embarcação>
+      }
+    },
+    "rumo": {
+      "fundo": <Rumo da embarcação em graus>
+    },
+    "velocidade": {
+      "fundo": <Velocidade da embarcação em nós>
+    },
+    "estimarPosicao": <Booleano que indica se a posição foi estimada>
+  },
+  "identificacao": {
+    "identificador": "<Identificador único da embarcação>"
+  },
+  "origem": "<Fonte do dado>",
+  "subOrigem": {
+    "nome": "<Nome da suborigem>",
+    "codigo": "<Código da suborigem>"
+  },
+  "descricaoOrigem": "<Descrição da origem>",
+  "sensores": {},
+  "classificacao": {
+    "tipoPrioritaria": "<Tipo de prioridade da embarcação>",
+    "voluntaria": {
+      "sidc": "<SIDC da embarcação>",
+      "ocorrencia": "<Timestamp da ocorrência>"
+    },
+    "sidc": "<SIDC da embarcação>",
+    "dimensao": {
+      "descricao": "<Descrição da dimensão da embarcação>",
+      "codigo": "<Código de classificação da embarcação>"
+    },
+    "hostilidade": {
+      "descricao": "<Descrição do status de hostilidade>",
+      "codigo": "<Código do status de hostilidade>"
+    }
+  },
+  "uuid": "<UUID do dado>",
+  "participanteFusao": <Booleano que indica se a embarcação participa de fusão de dados>,
+  "emOperacao": <Booleano que indica se a embarcação está em operação>,
+  "guid": "<GUID único do dado>"
+}
+```
 
 ## Observações
 
