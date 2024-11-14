@@ -12,12 +12,12 @@ Tool for analisys of AIS data
    - [Mapa de Calor (Heatmap) (GET)](#2-mapa-de-calor-heatmap--get-)
    - [Filtragem por Intervalo de Tempo (GET)](#3-filtragem-por-intervalo-de-tempo--get-)
    - [Retorno de Embarcação por Identificador Único (GET)](#4-retorno-de-embarcação-por-identificador-único--get-)
-3.[Formato de dados AIS utilizado no Tais](#formato-de-dados-ais-utilizado-no-tais)
+3. [Formato de dados AIS utilizado no Tais](#formato-de-dados-ais-utilizado-no-tais)
    - [Organização das pastas](#organização-das-pastas)
    - [Processamento dos dados CSV](#processamento-dos-dados-csv)
       - [Campos do CSV](#campos-do-csv)
    -[Descrição dos campos JSON](#descrição-dos-campos-json)
-4.[Observações](#observações)
+4. [Observações](#observações)
 
 ## Execução do Servidor Back-End
 
