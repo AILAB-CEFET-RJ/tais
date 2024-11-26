@@ -51,6 +51,16 @@ def get_heatmap_data():
 
     return calculate_heatmap_data()
 
+@app.route('/api/heatmap_csv', methods=['GET'])
+def get_heatmap_from_csv():
+    csv_file = "recorte_dados.csv"
+    vessel_id = request.args.get('vesselId')
+    start_time = request.args.get('startTime')
+    end_time = request.args.get('endTime')
+    
+    return calculate_heatmap_data_from_csv(csv_file, vessel_id, start_time, end_time)
+
+
 @app.route('/vessel/<string:vessel_id>', methods=['GET'])
 def get_vessel(vessel_id):
     df = getVessel("sorted_historico_acompanhamentos_24horas.csv", vessel_id)
@@ -84,7 +94,7 @@ def calculate_heatmap_data():
     lon_min, lon_max = coordenadas_embarcacao[:, 1].min(), coordenadas_embarcacao[:, 1].max()
 
     # Definir a resolução da grade (número de pontos na grade)
-    resolution = 100  # Ajuste conforme necessário
+    resolution = 100
 
     # Criar grade de coordenadas
     lat_grid = np.linspace(lat_min, lat_max, resolution)
@@ -107,6 +117,126 @@ def calculate_heatmap_data():
     plt.show()
 
     return density.tolist() # retornar sem tolist permite visualizar o heatmap, mas causa problemas com o Docker
+
+def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None):
+    """
+    Gera um mapa de calor das trajetórias de embarcações a partir de um CSV sem cabeçalhos.
+    
+    Parâmetros:
+        csv_file_path (str): Caminho do arquivo CSV.
+        vessel_id (str, opcional): ID da embarcação para filtrar. Default: None (sem filtro).
+        start_time (str, opcional): Data de início no formato 'YYYY-MM-DD HH:MM:SS'. Default: None.
+        end_time (str, opcional): Data de término no formato 'YYYY-MM-DD HH:MM:SS'. Default: None.
+    """
+    # Definir os nomes das colunas
+    column_names = [
+        'vesselId', 'long', 'lat', 'rumo', 
+        'velocidade', 'timestamp', 'origem', 'subOrigem'
+    ]
+    
+    # Carregar o CSV sem cabeçalhos e definir os nomes das colunas
+    try:
+        df = pd.read_csv(csv_file_path, header=None, names=column_names)
+        print(df.head())  # Exibe as primeiras linhas para debug
+        print(df.columns)  # Lista todas as colunas para debug
+    except Exception as e:
+        print(f"Erro ao carregar o arquivo CSV: {e}")
+        return {"error": f"Erro ao carregar o arquivo CSV: {str(e)}"}
+
+    df = normalize_timestamps(df) # remover os milissegundos das datas
+
+    try:
+        # Converter tentando automaticamente detectar o formato
+        df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+        
+        # Verifique o resultado após a conversão
+        print(df['timestamp'].head())
+        print(df.dtypes)
+        
+        # Identifique se restaram NaT
+        if df['timestamp'].isna().any():
+            print("Valores inválidos encontrados após conversão:")
+            print(df[df['timestamp'].isna()])
+    except Exception as e:
+        print(f"Erro ao converter 'timestamp': {e}")
+        return {"error": f"Erro ao converter 'timestamp': {str(e)}"}
+
+
+    print(df[df['timestamp'].isna()])  # Verificar se algum valor ficou como NaT
+
+    # Filtrar por ID da embarcação, se especificado
+    if vessel_id:
+        df = df[df['vesselId'] == vessel_id]
+
+    # Filtrar pelo intervalo de tempo, se especificado
+    if start_time and end_time:
+        try:
+            start_time = pd.to_datetime(start_time, format='%Y-%m-%d %H:%M:%S')
+            end_time = pd.to_datetime(end_time, format='%Y-%m-%d %H:%M:%S')
+            df = df[(df['timestamp'] >= start_time) & (df['timestamp'] <= end_time)]
+            print(f"Filtrando entre {start_time} e {end_time}")
+        except Exception as e:
+            print(f"Erro ao filtrar pelo intervalo de tempo: {e}")
+            return {"error": f"Erro ao filtrar pelo intervalo de tempo: {str(e)}"}
+
+    # Garantir que os dados de latitude e longitude estejam disponíveis
+    if df.empty or 'lat' not in df.columns or 'long' not in df.columns:
+        print("Nenhum dado válido encontrado no intervalo especificado.")
+        return {"error": "Nenhum dado válido encontrado no intervalo especificado."}
+
+    coordenadas_embarcacao = df[['lat', 'long']].to_numpy()
+
+    # Limites das coordenadas (latitude e longitude)
+    lat_min, lat_max = coordenadas_embarcacao[:, 0].min(), coordenadas_embarcacao[:, 0].max()
+    lon_min, lon_max = coordenadas_embarcacao[:, 1].min(), coordenadas_embarcacao[:, 1].max()
+
+    # Definir a resolução da grade (número de pontos na grade)
+    resolution = 100
+
+    # Criar grade de coordenadas
+    lat_grid = np.linspace(lat_min, lat_max, resolution)
+    lon_grid = np.linspace(lon_min, lon_max, resolution)
+    lat_mesh, lon_mesh = np.meshgrid(lat_grid, lon_grid)
+    grid_points = np.vstack([lat_mesh.ravel(), lon_mesh.ravel()])
+
+    # Calcular KDE
+    kde = gaussian_kde(coordenadas_embarcacao.T, bw_method='silverman')
+    density: np.ndarray = kde(grid_points)
+    density = density.reshape(lat_mesh.shape)
+
+    # Plotar o mapa de calor
+    plt.figure(figsize=(10, 8))
+    plt.imshow(density.T, origin='lower', extent=[lat_min, lat_max, lon_min, lon_max], cmap='hot', aspect='auto')
+    plt.colorbar(label='Density')
+    plt.title('Mapa de Calor das Rotas da Embarcação')
+    plt.xlabel('Latitude')
+    plt.ylabel('Longitude')
+    plt.show()
+
+    return density.tolist()
+
+
+def normalize_timestamps(df):
+    """
+    Remove os milissegundos da coluna de timestamps para garantir uniformidade.
+    """
+    try:
+        # Converter para string e remover milissegundos, se existirem
+        df['timestamp'] = df['timestamp'].astype(str).str.split('.').str[0]
+        
+        # Converter de volta para datetime sem milissegundos
+        df['timestamp'] = pd.to_datetime(df['timestamp'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
+        
+        # Exibir os primeiros valores para debug
+        print("Timestamps normalizados:")
+        print(df['timestamp'].head())
+    except Exception as e:
+        print(f"Erro ao normalizar timestamps: {e}")
+        return {"error": f"Erro ao normalizar timestamps: {str(e)}"}
+    
+    return df
+
+
 
 def filter_by_timestamp_range(sorted_csv_file_path, start_timestamp, end_timestamp):
     chunksize = 100000
