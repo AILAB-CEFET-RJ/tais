@@ -45,7 +45,7 @@ def calculate_heatmap_data():
     return density.tolist() # retornar sem tolist permite visualizar o heatmap, mas causa problemas com o Docker
 
 
-def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None):
+def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None, bbox=None):
     column_names = [
         'vesselId', 'long', 'lat', 'rumo', 
         'velocidade', 'timestamp'
@@ -81,13 +81,29 @@ def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=No
     # filtra pelo intervalo de tempo se tiver
     if start_time and end_time:
         try:
+            # Converte os parâmetros da URL para datetime
             start_time = pd.to_datetime(start_time, format='%Y-%m-%d %H:%M:%S')
             end_time = pd.to_datetime(end_time, format='%Y-%m-%d %H:%M:%S')
+
+            # Arredonda os timestamps do CSV para remover milissegundos
+            df['timestamp'] = df['timestamp'].dt.floor('S')
+
+            # Garante que o intervalo fornecido inclua os dados válidos no CSV
+            start_time = max(start_time, df['timestamp'].min())
+            end_time = min(end_time, df['timestamp'].max())
+
+            # Aplica o filtro
             df = df[(df['timestamp'] >= start_time) & (df['timestamp'] <= end_time)]
             print(f"Filtrando entre {start_time} e {end_time}")
         except Exception as e:
             print(f"Erro ao filtrar pelo intervalo de tempo: {e}")
             return {"error": f"Erro ao filtrar pelo intervalo de tempo: {str(e)}"}
+
+        
+    # filtra pela bounding box se tiver
+    if bbox:
+        lat_min, lon_min, lat_max, lon_max = bbox
+        df = df[(df['lat'] >= lat_min) & (df['lat'] <= lat_max) & (df['long'] >= lon_min) & (df['long'] <= lon_max)]
 
     if df.empty or 'lat' not in df.columns or 'long' not in df.columns:
         print("Nenhum dado válido encontrado no intervalo especificado.")
