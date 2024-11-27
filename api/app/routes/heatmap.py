@@ -9,7 +9,8 @@ def get_heatmap():
 
 @heatmap_bp.route("/heatmap_csv", methods=["GET"])
 def get_heatmap_from_csv():
-    csv_file = "recorte_dados.csv"
+    csv_file = "resources/dataset-09-29-recorte.csv"
+    #csv_file = "testee.csv"
     vessel_id = request.args.get("vesselId")
     start_time = request.args.get("startTime")
     end_time = request.args.get("endTime")

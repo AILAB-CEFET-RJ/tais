@@ -47,11 +47,13 @@ outras aplicações.
 
 ### 2. Mapa de Calor (Heatmap) ( GET )
 
-- **Rota**: /api/heatmap
+- **Rota**: /api/heatmap_csv
+
+- **Exemplo**: <http://127.0.0.1:5000/api/heatmap_csv?vesselId=IHS-AIS-209016000&startTime=2024-08-29%2000:08:54&endTime=2024-08-29%2023:56:13>
 
 - **Descrição**: Permite a visualização de um mapa de calor baseado nos dados AIS
 disponíveis. Este mapa de calor pode ser utilizado para identificar áreas de alta ou
-baixa densidade de tráfego marítimo.
+baixa densidade de tráfego marítimo. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
 
 ### 3. Filtragem por Intervalo de Tempo ( GET )
 

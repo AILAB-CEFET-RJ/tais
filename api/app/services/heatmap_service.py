@@ -7,7 +7,7 @@ from services.file_service import normalize_timestamps
 
 def calculate_heatmap_data():
 
-    f = open('recorte_data.json')
+    f = open('resources/recorte_data.json')
     
     data = json.load(f)
 
@@ -46,17 +46,9 @@ def calculate_heatmap_data():
 
 
 def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None):
-    """
-    Parâmetros:
-        csv_file_path (str): Caminho do arquivo CSV.
-        vessel_id (str, opcional): ID da embarcação para filtrar. Default: None (sem filtro).
-        start_time (str, opcional): Data de início no formato 'YYYY-MM-DD HH:MM:SS'. Default: None.
-        end_time (str, opcional): Data de término no formato 'YYYY-MM-DD HH:MM:SS'. Default: None.
-    """
-
     column_names = [
         'vesselId', 'long', 'lat', 'rumo', 
-        'velocidade', 'timestamp', 'origem', 'subOrigem'
+        'velocidade', 'timestamp'
     ]
     
     try:
@@ -103,7 +95,6 @@ def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=No
 
     coordenadas_embarcacao = df[['lat', 'long']].to_numpy()
 
-    # Limites das coordenadas (latitude e longitude)
     lat_min, lat_max = coordenadas_embarcacao[:, 0].min(), coordenadas_embarcacao[:, 0].max()
     lon_min, lon_max = coordenadas_embarcacao[:, 1].min(), coordenadas_embarcacao[:, 1].max()
 
