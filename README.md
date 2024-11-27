@@ -59,9 +59,9 @@ baixa densidade de tráfego marítimo.
 
 - Ao rodar a consulta, será gerado um arquivo ordenado chamado ```sorted_historico_acompanhamentos_24horas.csv```.
 
-- **Rota**: <http://127.0.0.1:5000/timestamp/start/end>
+- **Rota**: <http://127.0.0.1:5000/vessel/timestamp/start/end>
 
-- **Exemplo**: <http://127.0.0.1:5000/timestamp/2024-08-13%2000:00:00/2024-08-13%2000:10:00>
+- **Exemplo**: <http://127.0.0.1:5000/vessel/timestamp/2024-08-13%2000:00:00/2024-08-13%2000:10:00>
 
 - **Descrição**: Filtra as observações de embarcações por um intervalo de tempo específico. Essa funcionalidade é útil para análises temporais. No exemplo, as observações entre meia-noite e 00:10 do dia 13 de agosto de 2024 são filtradas.
 
