@@ -18,14 +18,10 @@ def convert_df_to_json(df):
                     }
                 }
             }
-           
-            # Adicionando a entrada à lista JSON
             json_data.append(entry)
-
-    # Convertendo a lista para JSON formatado
     return json.dumps(json_data, indent=4)
 
-def normalize_timestamps(df): # !usada em calculate_heatmap_data_from_csv
+def normalize_timestamps(df): #! usada em calculate_heatmap_data_from_csv
     try:
         # remover milissegundos se tiver
         df['timestamp'] = df['timestamp'].astype(str).str.split('.').str[0]

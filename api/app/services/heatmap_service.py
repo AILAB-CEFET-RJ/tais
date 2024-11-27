@@ -74,25 +74,18 @@ def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=No
 
     print(df[df['timestamp'].isna()])  # ve se algum valor ficou como na
 
-    # filtra por ID da embarcação se tiver
     if vessel_id:
         df = df[df['vesselId'] == vessel_id]
 
-    # filtra pelo intervalo de tempo se tiver
     if start_time and end_time:
         try:
-            # Converte os parâmetros da URL para datetime
             start_time = pd.to_datetime(start_time, format='%Y-%m-%d %H:%M:%S')
             end_time = pd.to_datetime(end_time, format='%Y-%m-%d %H:%M:%S')
 
-            # Arredonda os timestamps do CSV para remover milissegundos
             df['timestamp'] = df['timestamp'].dt.floor('S')
-
-            # Garante que o intervalo fornecido inclua os dados válidos no CSV
             start_time = max(start_time, df['timestamp'].min())
             end_time = min(end_time, df['timestamp'].max())
 
-            # Aplica o filtro
             df = df[(df['timestamp'] >= start_time) & (df['timestamp'] <= end_time)]
             print(f"Filtrando entre {start_time} e {end_time}")
         except Exception as e:

@@ -17,6 +17,6 @@ def get_heatmap_from_csv():
 
     bbox = request.args.get("bbox")
     if bbox:
-        bbox = list(map(float, bbox.split(',')))  # Convertendo a string em uma lista de floats
+        bbox = list(map(float, bbox.split(','))) 
 
     return calculate_heatmap_data_from_csv(csv_file, vessel_id, start_time, end_time)
