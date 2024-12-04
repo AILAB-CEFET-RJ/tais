@@ -86,8 +86,7 @@ A aplicação utiliza o formato JSON para representar as informações de rastre
 Os dados de rastreamento das embarcações são organizados em uma estrutura de pastas dentro do diretório ```data/cinematicas/```. Cada embarcação ou sistema de rastreamento tem uma subpasta específica, que é nomeada com um identificador único. Este identificador pode ser o nome da fonte de dados ou um código único, como ```ENTTM-RAD--<ID>```, ```OPENAV-FUN--<ID>```, ou outros, dependendo da origem dos dados. Dentro de cada subpasta, os dados da embarcação são armazenados em arquivos JSON nomeados com base em um timestamp, representando o momento exato em que os dados foram registrados.
 
 ### Processamento dos dados CSV
-
-Além dos dados JSON, a aplicação utiliza o arquivo ```historico_acompanhamentos_24horas.csv```, que contém dados históricos de rastreamento. O CSV é lido e processado, permitindo a consulta de dados filtrados por timestamp ou ID da embarcação. Quando necessário, o arquivo é ordenado para garantir que os dados sejam manipulados de forma cronológica.
+A aplicação utiliza o arquivo ```historico_acompanhamentos_24horas.csv```, que contém dados históricos de rastreamento. O CSV é lido e processado, permitindo a consulta de dados filtrados por timestamp ou ID da embarcação. Quando necessário, o arquivo é ordenado para garantir que os dados sejam manipulados de forma cronológica.
 
 #### Campos do CSV
 
@@ -104,66 +103,8 @@ O arquivo ```historico_acompanhamentos_24horas.csv``` possui as seguintes coluna
 | `origem`     | tecnologia ou sistema de monitoramento utilizado (ex: AIS)                     |
 | `subOrigem`  |  Origem adicional ou especificação do tipo de monitoramento (ex: Satelital)      |
 
-### Descrição dos campos JSON
-
-O formato dos dados utilizados segue a seguinte estrutura:
-
-```json
-{
-  "fonte": "<Fonte dos Dados>",
-  "timestamp": "<Carimbo de data e hora do registro>",
-  "perdido": <Booleano que indica se os dados estão perdidos>,
-  "cinematica": {
-    "timestamp": "<Carimbo de data e hora do movimento>",
-    "posicao": {
-      "geo": {
-        "lat": <Latitude da posição da embarcação>,
-        "lng": <Longitude da posição da embarcação>
-      }
-    },
-    "rumo": {
-      "fundo": <Rumo da embarcação em graus>
-    },
-    "velocidade": {
-      "fundo": <Velocidade da embarcação em nós>
-    },
-    "estimarPosicao": <Booleano que indica se a posição foi estimada>
-  },
-  "identificacao": {
-    "identificador": "<Identificador único da embarcação>"
-  },
-  "origem": "<Fonte do dado>",
-  "subOrigem": {
-    "nome": "<Nome da suborigem>",
-    "codigo": "<Código da suborigem>"
-  },
-  "descricaoOrigem": "<Descrição da origem>",
-  "sensores": {},
-  "classificacao": {
-    "tipoPrioritaria": "<Tipo de prioridade da embarcação>",
-    "voluntaria": {
-      "sidc": "<SIDC da embarcação>",
-      "ocorrencia": "<Timestamp da ocorrência>"
-    },
-    "sidc": "<SIDC da embarcação>",
-    "dimensao": {
-      "descricao": "<Descrição da dimensão da embarcação>",
-      "codigo": "<Código de classificação da embarcação>"
-    },
-    "hostilidade": {
-      "descricao": "<Descrição do status de hostilidade>",
-      "codigo": "<Código do status de hostilidade>"
-    }
-  },
-  "uuid": "<UUID do dado>",
-  "participanteFusao": <Booleano que indica se a embarcação participa de fusão de dados>,
-  "emOperacao": <Booleano que indica se a embarcação está em operação>,
-  "guid": "<GUID único do dado>"
-}
-```
-
 ## Observações
 
-- Os dados utilizados pela API são lidos de arquivos JSON e CSV armazenados localmente.
+- Os dados brutos utilizados pela API são gerados de arquivos CSV armazenados localmente. No repositorio encontram-se recortes de dados menores desses arquivos para facilitar o processamento.
 
 - Certifique-se de que os arquivos necessários estejam no diretório correto antes de executar as funcionalidades da API.
