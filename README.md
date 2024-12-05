@@ -8,16 +8,14 @@ Tool for analisys of AIS data
    - [Para executar no ambiente de Desenvolvimento (DEV)](#para-executar-no-ambiente-de-desenvolvimento-dev)
    - [Alternativamente para rodar a aplicação sem o encapsulamento do Docker](#alternativamente-para-rodar-a-aplicação-sem-o-encapsulamento-do-docker)
 2. [Instruções sobre a utilização da API](#instruções-sobre-a-utilização-da-api)
-   - [Visualização de Dados Processados (GET)](#1-visualização-de-dados-processados--get-)
-   - [Mapa de Calor (Heatmap) (GET)](#2-mapa-de-calor-heatmap--get-)
-   - [Dados do Mapa de Calor (Heatmap) (GET)](#3-dados-do-mapa-de-calor-heatmap--get-)
-   - [Filtragem por Intervalo de Tempo (GET)](#4-filtragem-por-intervalo-de-tempo--get-)
-   - [Retorno de Embarcação por Identificador Único (GET)](#5-retorno-de-embarcação-por-identificador-único--get-)
+   - [Mapa de Calor (Heatmap) (GET)](#1-mapa-de-calor-heatmap--get-)
+   - [Dados do Mapa de Calor (Heatmap) (GET)](#2-dados-do-mapa-de-calor-heatmap--get-)
+   - [Filtragem por Intervalo de Tempo (GET)](#3-filtragem-por-intervalo-de-tempo--get-)
+   - [Retorno de Embarcação por Identificador Único (GET)](#4-retorno-de-embarcação-por-identificador-único--get-)
 3. [Formato de dados AIS utilizado no Tais](#formato-de-dados-ais-utilizado-no-tais)
    - [Organização das pastas](#organização-das-pastas)
    - [Processamento dos dados CSV](#processamento-dos-dados-csv)
       - [Campos do CSV](#campos-do-csv)
-   - [Descrição dos campos JSON](#descrição-dos-campos-json)
 4. [Observações](#observações)
 
 ## Execução do Servidor Back-End
@@ -38,15 +36,7 @@ Tool for analisys of AIS data
 
 ## Instruções sobre a utilização da API
 
-### 1. Visualização de Dados Processados ( GET )
-
-- **Rota**: /api/data
-
-- **Descrição**: Esta funcionalidade permite o acesso a dados processados em formato
-JSON. Os dados podem ser utilizados para análise, visualização ou integração com
-outras aplicações.
-
-### 2. Mapa de Calor (Heatmap) ( GET )
+### 1. Mapa de Calor (Heatmap) ( GET )
 
 - **Rota**: /visualization
 
@@ -56,7 +46,7 @@ outras aplicações.
 disponíveis. Este mapa de calor pode ser utilizado para identificar áreas de alta ou
 baixa densidade de tráfego marítimo. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
 
-### 3. Dados do Mapa de Calor (Heatmap) ( GET )
+### 2. Dados do Mapa de Calor (Heatmap) ( GET )
 
 - **Rota**: /api/heatmap_csv
 
@@ -65,7 +55,7 @@ baixa densidade de tráfego marítimo. Pode-se especificar o vesselId da embarca
 - **Descrição**: Retorna os dados puros de um mapa de calor baseado nos dados AIS
 disponíveis. Estes dados podem ser usados na construção de um mapa de calor ou simplesmente para análise direta. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
 
-### 4. Filtragem por Intervalo de Tempo ( GET )
+### 3. Filtragem por Intervalo de Tempo ( GET )
 
 - Baixe o arquivo ```historico_acompanhamentos_24horas.csv``` e coloque-o no mesmo diretório que o ```app.py```.
 
@@ -77,7 +67,7 @@ disponíveis. Estes dados podem ser usados na construção de um mapa de calor o
 
 - **Descrição**: Filtra as observações de embarcações por um intervalo de tempo específico. Essa funcionalidade é útil para análises temporais. No exemplo, as observações entre meia-noite e 00:10 do dia 13 de agosto de 2024 são filtradas.
 
-### 5. Retorno de Embarcação por Identificador Único ( GET )
+### 4. Retorno de Embarcação por Identificador Único ( GET )
 
 - Para fazer essa consulta, também é necessário baixar o arquivo ```historico_acompanhamentos_24horas.csv``` e colocá-lo no mesmo diretório que o ```app.py```. Se isso não foi feito anteriormente, é necessário realizá-lo agora.
 
@@ -93,9 +83,23 @@ A aplicação utiliza o formato JSON para representar as informações de rastre
 
 ### Organização das pastas
 
-Os dados de rastreamento das embarcações são organizados em uma estrutura de pastas dentro do diretório ```data/cinematicas/```. Cada embarcação ou sistema de rastreamento tem uma subpasta específica, que é nomeada com um identificador único. Este identificador pode ser o nome da fonte de dados ou um código único, como ```ENTTM-RAD--<ID>```, ```OPENAV-FUN--<ID>```, ou outros, dependendo da origem dos dados. Dentro de cada subpasta, os dados da embarcação são armazenados em arquivos JSON nomeados com base em um timestamp, representando o momento exato em que os dados foram registrados.
+1. ```img```: local onde são salvas as imagens geradas pela API
+
+2. ```routes/```: Contém os arquivos responsáveis pelas rotas da aplicação Flask, divididas por responsabilidade:
+    **home.py**: Rota inicial e informações gerais da API.
+    **heatmap.py**: Rotas relacionadas aos mapas de calor.
+    **vessel.py**: Rotas para consultas e filtragens de dados de embarcações.
+    **visualization.py**: Rotas para visualização dos dados
+
+3. ```services/```: Implementa a lógica da aplicação, separando as funcionalidades em serviços reutilizáveis:
+    **heatmap_service.py**: Funções para cálculos de heatmaps.
+    **vessel_service.py**: Manipulação de dados relacionados a embarcações.
+    **file_service.py**: Normalização de timestamps e conversões de dados.
+
+4. ```resources/```: Contém os arquivos de dados usados pela aplicação, como o CSV com as trajetórias.
 
 ### Processamento dos dados CSV
+
 A aplicação utiliza o arquivo ```historico_acompanhamentos_24horas.csv```, que contém dados históricos de rastreamento. O CSV é lido e processado, permitindo a consulta de dados filtrados por timestamp ou ID da embarcação. Quando necessário, o arquivo é ordenado para garantir que os dados sejam manipulados de forma cronológica.
 
 #### Campos do CSV
