@@ -10,8 +10,9 @@ Tool for analisys of AIS data
 2. [Instruções sobre a utilização da API](#instruções-sobre-a-utilização-da-api)
    - [Visualização de Dados Processados (GET)](#1-visualização-de-dados-processados--get-)
    - [Mapa de Calor (Heatmap) (GET)](#2-mapa-de-calor-heatmap--get-)
-   - [Filtragem por Intervalo de Tempo (GET)](#3-filtragem-por-intervalo-de-tempo--get-)
-   - [Retorno de Embarcação por Identificador Único (GET)](#4-retorno-de-embarcação-por-identificador-único--get-)
+   - [Dados do Mapa de Calor (Heatmap) (GET)](#3-dados-do-mapa-de-calor-heatmap--get-)
+   - [Filtragem por Intervalo de Tempo (GET)](#4-filtragem-por-intervalo-de-tempo--get-)
+   - [Retorno de Embarcação por Identificador Único (GET)](#5-retorno-de-embarcação-por-identificador-único--get-)
 3. [Formato de dados AIS utilizado no Tais](#formato-de-dados-ais-utilizado-no-tais)
    - [Organização das pastas](#organização-das-pastas)
    - [Processamento dos dados CSV](#processamento-dos-dados-csv)
@@ -47,15 +48,24 @@ outras aplicações.
 
 ### 2. Mapa de Calor (Heatmap) ( GET )
 
-- **Rota**: /api/heatmap_csv
+- **Rota**: /visualization
 
-- **Exemplo**: <http://127.0.0.1:5000/api/heatmap_csv?vesselId=IHS-AIS-209016000&startTime=2024-08-29%2000:08:54&endTime=2024-08-29%2023:56:13>
+- **Exemplo**: <http://127.0.0.1:5000/visualization?vesselId=IHS-AIS-209016000&startTime=2024-08-29%2000:08:54&endTime=2024-08-29%2023:56:13>
 
 - **Descrição**: Permite a visualização de um mapa de calor baseado nos dados AIS
 disponíveis. Este mapa de calor pode ser utilizado para identificar áreas de alta ou
 baixa densidade de tráfego marítimo. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
 
-### 3. Filtragem por Intervalo de Tempo ( GET )
+### 3. Dados do Mapa de Calor (Heatmap) ( GET )
+
+- **Rota**: /api/heatmap_csv
+
+- **Exemplo**: <http://127.0.0.1:5000/api/heatmap_csv?vesselId=IHS-AIS-209016000&startTime=2024-08-29%2000:08:54&endTime=2024-08-29%2023:56:13>
+
+- **Descrição**: Retorna os dados puros de um mapa de calor baseado nos dados AIS
+disponíveis. Estes dados podem ser usados na construção de um mapa de calor ou simplesmente para análise direta. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
+
+### 4. Filtragem por Intervalo de Tempo ( GET )
 
 - Baixe o arquivo ```historico_acompanhamentos_24horas.csv``` e coloque-o no mesmo diretório que o ```app.py```.
 
@@ -67,7 +77,7 @@ baixa densidade de tráfego marítimo. Pode-se especificar o vesselId da embarca
 
 - **Descrição**: Filtra as observações de embarcações por um intervalo de tempo específico. Essa funcionalidade é útil para análises temporais. No exemplo, as observações entre meia-noite e 00:10 do dia 13 de agosto de 2024 são filtradas.
 
-### 4. Retorno de Embarcação por Identificador Único ( GET )
+### 5. Retorno de Embarcação por Identificador Único ( GET )
 
 - Para fazer essa consulta, também é necessário baixar o arquivo ```historico_acompanhamentos_24horas.csv``` e colocá-lo no mesmo diretório que o ```app.py```. Se isso não foi feito anteriormente, é necessário realizá-lo agora.
 

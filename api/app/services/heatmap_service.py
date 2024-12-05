@@ -4,6 +4,7 @@ from scipy.stats import gaussian_kde
 import matplotlib.pyplot as plt
 import pandas as pd
 from services.file_service import normalize_timestamps
+from flask import Response,jsonify
 
 def calculate_heatmap_data():
 
@@ -45,7 +46,7 @@ def calculate_heatmap_data():
     return density.tolist() # retornar sem tolist permite visualizar o heatmap, mas causa problemas com o Docker
 
 
-def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None, bbox=None):
+def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None, bbox=None)->Response:
     column_names = [
         'vesselId', 'long', 'lat', 'rumo', 
         'velocidade', 'timestamp'
@@ -101,6 +102,9 @@ def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=No
     if df.empty or 'lat' not in df.columns or 'long' not in df.columns:
         print("Nenhum dado válido encontrado no intervalo especificado.")
         return {"error": "Nenhum dado válido encontrado no intervalo especificado."}
+    
+    # filtra dados com velocidade 0
+    df = df[df["velocidade"]>0]
 
     coordenadas_embarcacao = df[['lat', 'long']].to_numpy()
 
@@ -117,13 +121,12 @@ def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=No
     kde = gaussian_kde(coordenadas_embarcacao.T, bw_method='silverman')
     density: np.ndarray = kde(grid_points)
     density = density.reshape(lat_mesh.shape)
-
-    plt.figure(figsize=(10, 8)) # plotagem em si
-    plt.imshow(density.T, origin='lower', extent=[lat_min, lat_max, lon_min, lon_max], cmap='hot', aspect='auto')
-    plt.colorbar(label='Density')
-    plt.title('Mapa de Calor das Rotas da Embarcação')
-    plt.xlabel('Latitude')
-    plt.ylabel('Longitude')
-    plt.show()
-
-    return density.tolist()
+    
+    return jsonify({
+        "density_array":density.T.tolist(),
+        "min_latitude":lat_min,
+        "max_latitude":lat_max,
+        "min_longitude":lon_min,
+        "max_longitude":lon_max,
+        "vel":df["velocidade"].tolist()
+        })

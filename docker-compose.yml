@@ -11,7 +11,10 @@ services:
     ports:
       - 5000:5000
     deploy:
-      resources:
+      resources: 
+      # não usar esses limites de recurso no deployment final,
+      # se esse é o deployment final e a aplicação estiver travando
+      # remova os limites de recurso
         limits:
           cpus: '1.5'
           memory: 1G
