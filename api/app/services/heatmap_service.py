@@ -96,6 +96,7 @@ def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=No
         
     # filtra pela bounding box se tiver
     if bbox:
+        print("Recebido bbox:", bbox)
         lat_min, lon_min, lat_max, lon_max = bbox
         df = df[(df['lat'] >= lat_min) & (df['lat'] <= lat_max) & (df['long'] >= lon_min) & (df['long'] <= lon_max)]
 

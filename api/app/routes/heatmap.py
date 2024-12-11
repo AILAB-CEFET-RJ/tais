@@ -14,9 +14,7 @@ def get_heatmap_from_csv():
     vessel_id = request.args.get("vesselId")
     start_time = request.args.get("startTime")
     end_time = request.args.get("endTime")
-
     bbox = request.args.get("bbox")
-    if bbox:
-        bbox = list(map(float, bbox.split(','))) 
+    print("Recebido bbox:", bbox)
 
-    return calculate_heatmap_data_from_csv(csv_file, vessel_id, start_time, end_time)
+    return calculate_heatmap_data_from_csv(csv_file, vessel_id, start_time, end_time, bbox)
