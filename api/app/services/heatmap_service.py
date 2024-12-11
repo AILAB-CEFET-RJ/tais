@@ -6,7 +6,7 @@ import pandas as pd
 from services.file_service import normalize_timestamps
 from flask import Response,jsonify
 
-def calculate_heatmap_data():
+def calculate_heatmap_data(bbox=None):
 
     f = open('resources/recorte_data.json')
     
@@ -21,7 +21,17 @@ def calculate_heatmap_data():
         longitude = i["cinematica"]["posicao"]["geo"]["lng"]
         coordenada = np.array([[latitude, longitude]])
         coordenadas_embarcacao = np.append(coordenadas_embarcacao, coordenada, axis=0)
-  
+
+    if bbox:
+        bbox = list(map(float, bbox.split(',')))
+        lat_min, lon_min, lat_max, lon_max = bbox
+        coordenadas_embarcacao = coordenadas_embarcacao[
+            (coordenadas_embarcacao[:, 0] >= lat_min) &
+            (coordenadas_embarcacao[:, 0] <= lat_max) &
+            (coordenadas_embarcacao[:, 1] >= lon_min) &
+            (coordenadas_embarcacao[:, 1] <= lon_max)
+    ]
+
     lat_min, lat_max = coordenadas_embarcacao[:, 0].min(), coordenadas_embarcacao[:, 0].max()
     lon_min, lon_max = coordenadas_embarcacao[:, 1].min(), coordenadas_embarcacao[:, 1].max()
 
@@ -93,17 +103,6 @@ def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=No
             print(f"Erro ao filtrar pelo intervalo de tempo: {e}")
             return {"error": f"Erro ao filtrar pelo intervalo de tempo: {str(e)}"}
 
-        
-    # filtra pela bounding box se tiver
-    if bbox:
-        print("Recebido bbox:", bbox)
-        lat_min, lon_min, lat_max, lon_max = bbox
-        df = df[(df['lat'] >= lat_min) & (df['lat'] <= lat_max) & (df['long'] >= lon_min) & (df['long'] <= lon_max)]
-
-    if df.empty or 'lat' not in df.columns or 'long' not in df.columns:
-        print("Nenhum dado válido encontrado no intervalo especificado.")
-        return {"error": "Nenhum dado válido encontrado no intervalo especificado."}
-    
     # filtra dados com velocidade 0
     df = df[df["velocidade"]>0]
 
