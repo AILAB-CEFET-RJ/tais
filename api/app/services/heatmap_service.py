@@ -6,7 +6,7 @@ import pandas as pd
 from services.file_service import normalize_timestamps
 from flask import Response,jsonify
 
-def calculate_heatmap_data(bbox=None):
+def calculate_heatmap_data():
 
     f = open('resources/recorte_data.json')
     
@@ -22,18 +22,17 @@ def calculate_heatmap_data(bbox=None):
         coordenada = np.array([[latitude, longitude]])
         coordenadas_embarcacao = np.append(coordenadas_embarcacao, coordenada, axis=0)
 
+    bbox = request.args.get("bbox")
+    # Filtra os dados pela bbox se fornecido
     if bbox:
         bbox = list(map(float, bbox.split(',')))
         lat_min, lon_min, lat_max, lon_max = bbox
-        coordenadas_embarcacao = coordenadas_embarcacao[
-            (coordenadas_embarcacao[:, 0] >= lat_min) &
-            (coordenadas_embarcacao[:, 0] <= lat_max) &
-            (coordenadas_embarcacao[:, 1] >= lon_min) &
-            (coordenadas_embarcacao[:, 1] <= lon_max)
-    ]
+        df = df[(df['lat'] >= lat_min) & (df['lat'] <= lat_max) &
+                (df['long'] >= lon_min) & (df['long'] <= lon_max)]
+    else:
+        lat_min, lat_max = df['lat'].min(), df['lat'].max()
+        lon_min, lon_max = df['long'].min(), df['long'].max()
 
-    lat_min, lat_max = coordenadas_embarcacao[:, 0].min(), coordenadas_embarcacao[:, 0].max()
-    lon_min, lon_max = coordenadas_embarcacao[:, 1].min(), coordenadas_embarcacao[:, 1].max()
 
     resolution = 100
     lat_grid = np.linspace(lat_min, lat_max, resolution)
