@@ -46,7 +46,16 @@ Tool for analisys of AIS data
 disponíveis. Este mapa de calor pode ser utilizado para identificar áreas de alta ou
 baixa densidade de tráfego marítimo. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
 
-### 2. Dados do Mapa de Calor (Heatmap) ( GET )
+### 2. Mapa de Calor (Heatmap) com bounding-box ( GET )
+
+- **Rota**: /visualization
+
+- **Exemplo**: <http://127.0.0.1:5000/visualization?vesselId=IHS-AIS-100001974&startTime=2024-08-29%2013:01:21&endTime=2024-08-29%2023:31:17&bbox=-23.116365,-43.304672,-22.816061,-42.867279>
+
+- **Descrição**: Permite a visualização de um mapa de calor baseado nos dados AIS
+disponíveis, tendo em consideração uma área delimitada por dois pares de coordenadas indicadas pelo usuário. Este mapa de calor pode ser utilizado para identificar áreas de alta ou baixa densidade de tráfego marítimo. Assim como no item anterior, pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
+
+### 3. Dados do Mapa de Calor (Heatmap) ( GET )
 
 - **Rota**: /api/heatmap_csv
 
@@ -55,7 +64,7 @@ baixa densidade de tráfego marítimo. Pode-se especificar o vesselId da embarca
 - **Descrição**: Retorna os dados puros de um mapa de calor baseado nos dados AIS
 disponíveis. Estes dados podem ser usados na construção de um mapa de calor ou simplesmente para análise direta. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
 
-### 3. Filtragem por Intervalo de Tempo ( GET )
+### 4. Filtragem por Intervalo de Tempo ( GET )
 
 - Baixe o arquivo ```historico_acompanhamentos_24horas.csv``` e coloque-o no mesmo diretório que o ```app.py```.
 
@@ -67,7 +76,7 @@ disponíveis. Estes dados podem ser usados na construção de um mapa de calor o
 
 - **Descrição**: Filtra as observações de embarcações por um intervalo de tempo específico. Essa funcionalidade é útil para análises temporais. No exemplo, as observações entre meia-noite e 00:10 do dia 13 de agosto de 2024 são filtradas.
 
-### 4. Retorno de Embarcação por Identificador Único ( GET )
+### 5. Retorno de Embarcação por Identificador Único ( GET )
 
 - Para fazer essa consulta, também é necessário baixar o arquivo ```historico_acompanhamentos_24horas.csv``` e colocá-lo no mesmo diretório que o ```app.py```. Se isso não foi feito anteriormente, é necessário realizá-lo agora.
 

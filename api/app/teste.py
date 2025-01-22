@@ -75,7 +75,7 @@ if __name__ == '__main__':
     pontos_exemplo = [
         {"latitude": -23.5505, "longitude": -46.6333, "tempo": "2024-11-27 12:00:00"},
         {"latitude": -23.5510, "longitude": -46.6340, "tempo": "2024-11-27 12:05:00"},
-        {"latitude": -23.5520, "longitude": -46.6350, "tempo": "2024-11-27 12:10:00"},
+        {"latitude": -23.5520, "longitude": -46.6350, "tempo": "2024-11-27 22:10:00"},
     ]
 
     resultado = interpolar_pontos_com_dados("IHS-TESTE", pontos_exemplo, 6)
