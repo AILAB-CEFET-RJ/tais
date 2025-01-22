@@ -12,3 +12,4 @@ asyncio
 scipy
 matplotlib
 basemap
+basemap-data-hires

@@ -1,4 +1,6 @@
 import os
+import matplotlib
+matplotlib.use("Agg")  # Define o backend para uso não interativo
 import matplotlib.pyplot as plt
 import io
 from flask import Response
@@ -9,7 +11,7 @@ import numpy as np
 
 # Defina o caminho para salvar as imagens
 IMAGE_SAVE_DIR = "img"
-visualization_bp = Blueprint("visualization",__name__)
+visualization_bp = Blueprint("visualization", __name__)
 
 @visualization_bp.route("/", methods=["GET"])
 def view_heatmap() -> Response:
@@ -41,63 +43,61 @@ def view_heatmap() -> Response:
             assert lat_min < lat_max and lon_min < lon_max, "Coordenadas da bounding box inválidas"
         except (ValueError, AssertionError) as e:
             return Response(f"Erro no formato da bounding box: {str(e)}", status=400)
-
-    print(f"Lat_Min: {lat_min}, Lon_Min: {lon_min}, Lat_Max: {lat_max}, Lon_Max: {lon_max}")
-
-    # Calcular padding adequado (ajustado)
-    lat_padding = max(0.5 - (lat_max - lat_min), 0) / 2
-    lon_padding = max(0.5 - (lon_max - lon_min), 0) / 2
+        print(f"Lat_Min: {lat_min}, Lon_Min: {lon_min}, Lat_Max: {lat_max}, Lon_Max: {lon_max}")
+        lat_padding, lon_padding = 0, 0
+        
+    else:
+        # Calcular padding adequado (ajustado)
+        if abs((lat_max - lat_min))>abs((lon_max - lon_min)):
+                lat_padding = max((lat_max - lat_min),0)/4
+                lon_padding = lat_padding
+        else:
+            lon_padding = max((lon_max - lon_min),0)/4
+            lat_padding = lon_padding
 
     # Criação do heatmap
     fig = plt.figure(figsize=(10, 10))
-    # criando recorte contendo rota encontrada, com no mínimo 40 graus em latitude e longitude, do mapa mundi usando projeção cilindrica de Miller
-    mapamundi = Basemap(
-        projection="mill",
-        llcrnrlat=lat_min - lat_padding,
-        llcrnrlon=lon_min - lon_padding,
-        urcrnrlat=lat_max + lat_padding,
-        urcrnrlon=lon_max + lon_padding,
-        resolution='i'
-    )
-    mapamundi.drawcoastlines(linewidth=1)
-    mapamundi.drawcountries(linewidth=1)
-    mapamundi.drawstates(linestyle="dashed")
+    try:
+        # criando recorte contendo rota encontrada, com no mínimo 9 graus em latitude e longitude, do mapa mundi usando projeção cilindrica de Miller
+        mapamundi = Basemap(
+            projection="mill",
+            llcrnrlat=lat_min - lat_padding,
+            llcrnrlon=lon_min - lon_padding,
+            urcrnrlat=lat_max + lat_padding,
+            urcrnrlon=lon_max + lon_padding,
+            resolution='f'
+        )
+        mapamundi.drawcoastlines(linewidth=3)
+        mapamundi.drawcountries(linewidth=3)
+        mapamundi.drawstates(linestyle="dashed")
 
-    # Gerar coordenadas para o heatmap
-    lons = np.linspace(lon_min, lon_max, density.shape[1])
-    lats = np.linspace(lat_min, lat_max, density.shape[0])
-    lon_grid, lat_grid = np.meshgrid(lons, lats)
+        # Gerar coordenadas para o heatmap
+        lons = np.linspace(lon_min, lon_max, density.shape[1])
+        lats = np.linspace(lat_min, lat_max, density.shape[0])
+        lon_grid, lat_grid = np.meshgrid(lons, lats)
 
-    # Sobrepor heatmap ao mapa
-    heatmap = mapamundi.pcolormesh(lon_grid, lat_grid, density, cmap='bwr', shading='auto', latlon=True)
+        # Sobrepor heatmap ao mapa
+        heatmap = mapamundi.pcolormesh(lon_grid, lat_grid, density, cmap='bwr', shading='auto', latlon=True)
 
-    mapamundi.fillcontinents(color='lightgreen', lake_color='blue')
-    mapamundi.drawmapboundary(fill_color="blue")
+        mapamundi.fillcontinents(color='lightgreen', lake_color='blue')
+        mapamundi.drawmapboundary(fill_color="blue")
 
+        escala = plt.colorbar(heatmap)
+        escala.set_label("Density", fontsize=20)
+        escala.set_ticks([density.max(), 0], labels=["barcos", "mar"], size=20)
+        plt.title("Mapa de Calor das Rotas da Embarcação", fontsize=24)
+        plt.xlabel("Longitude", fontsize=20)
+        plt.ylabel("Latitude", fontsize=20)
 
-    # plt.imshow(density, origin="lower", extent=[lat_min, lat_max, lon_min, lon_max], cmap="hot", aspect="auto")
-    # escala = plt.colorbar(heatmap)
-    # escala.set_ticks([density.max(),0],labels=["barcos","mar"],size=45)
-    # escala.set_label("Density",**{"size":60})
-    # plt.title("Mapa de Calor das Rotas da Embarcação",**{"size":120},pad=80)
-    # plt.xlabel("Latitude",labelpad=20,**{"size":60})
-    # plt.ylabel("Longitude",labelpad=20,**{"size":60})
+        os.makedirs(IMAGE_SAVE_DIR, exist_ok=True)
+        image_path = os.path.join(IMAGE_SAVE_DIR, "heatmap.svg")
+        plt.savefig(image_path, format="svg")
 
-    escala = plt.colorbar(heatmap)
-    escala.set_label("Density", fontsize=20)
-    escala.set_ticks([density.max(),0],labels=["barcos","mar"],size=20)
-    plt.title("Mapa de Calor das Rotas da Embarcação", fontsize=24)
-    plt.xlabel("Longitude", fontsize=20)
-    plt.ylabel("Latitude", fontsize=20)
-
-    os.makedirs(IMAGE_SAVE_DIR, exist_ok=True)
-    image_path = os.path.join(IMAGE_SAVE_DIR, "heatmap.svg")
-    plt.savefig(image_path, format="svg")
-
-    # Gera a imagem em memória para resposta HTTP
-    img = io.BytesIO()
-    plt.savefig(img, format="svg")
-    img.seek(0)
-    plt.close(fig)
+        # Gera a imagem em memória para resposta HTTP
+        img = io.BytesIO()
+        plt.savefig(img, format="svg")
+        img.seek(0)
+    finally:
+        plt.close(fig)  # Garante que o recurso será liberado
 
     return Response(img.getvalue(), mimetype="image/svg+xml")

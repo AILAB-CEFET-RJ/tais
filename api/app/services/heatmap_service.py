@@ -1,59 +1,9 @@
-import json
 import numpy as np
 from scipy.stats import gaussian_kde
 import matplotlib.pyplot as plt
 import pandas as pd
 from services.file_service import normalize_timestamps
-from flask import Response,jsonify
-
-def calculate_heatmap_data():
-
-    f = open('resources/recorte_data.json')
-    
-    data = json.load(f)
-
-    f.close()
-    
-    coordenadas_embarcacao = np.empty((0, 2))
-
-    for i in data:
-        latitude = i["cinematica"]["posicao"]["geo"]["lat"]
-        longitude = i["cinematica"]["posicao"]["geo"]["lng"]
-        coordenada = np.array([[latitude, longitude]])
-        coordenadas_embarcacao = np.append(coordenadas_embarcacao, coordenada, axis=0)
-
-    bbox = request.args.get("bbox")
-    # Filtra os dados pela bbox se fornecido
-    if bbox:
-        bbox = list(map(float, bbox.split(',')))
-        lat_min, lon_min, lat_max, lon_max = bbox
-        df = df[(df['lat'] >= lat_min) & (df['lat'] <= lat_max) &
-                (df['long'] >= lon_min) & (df['long'] <= lon_max)]
-    else:
-        lat_min, lat_max = df['lat'].min(), df['lat'].max()
-        lon_min, lon_max = df['long'].min(), df['long'].max()
-
-
-    resolution = 100
-    lat_grid = np.linspace(lat_min, lat_max, resolution)
-    lon_grid = np.linspace(lon_min, lon_max, resolution)
-    lat_mesh, lon_mesh = np.meshgrid(lat_grid, lon_grid)
-    grid_points = np.vstack([lat_mesh.ravel(), lon_mesh.ravel()])
-    
-    kde = gaussian_kde(coordenadas_embarcacao.T, bw_method='silverman')
-    density:np.ndarray = kde(grid_points)
-    density = density.reshape(lat_mesh.shape)
-    
-    plt.figure(figsize=(10, 8))
-    plt.imshow(density.T, origin='lower', extent=[lat_min, lat_max, lon_min, lon_max], cmap='hot', aspect='auto')
-    plt.colorbar(label='Density')
-    plt.title('Mapa de Calor das Rotas da Embarcação')
-    plt.xlabel('Latitude')
-    plt.ylabel('Longitude')
-    plt.show()
-
-    return density.tolist() # retornar sem tolist permite visualizar o heatmap, mas causa problemas com o Docker
-
+from flask import Response,jsonify,request
 
 def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None, bbox=None)->Response:
     column_names = [
@@ -101,6 +51,17 @@ def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=No
         except Exception as e:
             print(f"Erro ao filtrar pelo intervalo de tempo: {e}")
             return {"error": f"Erro ao filtrar pelo intervalo de tempo: {str(e)}"}
+
+    # bbox = request.args.get("bbox")
+    # # Filtra os dados pela bbox se fornecido
+    # if bbox:
+    #     bbox = list(map(float, bbox.split(',')))
+    #     lat_min, lon_min, lat_max, lon_max = bbox
+    #     df = df[(df['lat'] >= lat_min) & (df['lat'] <= lat_max) &
+    #             (df['long'] >= lon_min) & (df['long'] <= lon_max)]
+    # else:
+    #     lat_min, lat_max = df['lat'].min(), df['lat'].max()
+    #     lon_min, lon_max = df['long'].min(), df['long'].max()
 
     # filtra dados com velocidade 0
     df = df[df["velocidade"]>0]

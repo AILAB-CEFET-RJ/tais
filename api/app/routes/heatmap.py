@@ -1,11 +1,7 @@
 from flask import Blueprint, request
-from services.heatmap_service import calculate_heatmap_data, calculate_heatmap_data_from_csv
+from services.heatmap_service import calculate_heatmap_data_from_csv
 
 heatmap_bp = Blueprint("heatmap", __name__)
-
-@heatmap_bp.route("/heatmap", methods=["GET"])
-def get_heatmap():
-    return calculate_heatmap_data()
 
 @heatmap_bp.route("/heatmap_csv", methods=["GET"])
 def get_heatmap_from_csv():
