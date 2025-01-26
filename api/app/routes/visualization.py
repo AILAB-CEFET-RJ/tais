@@ -67,7 +67,7 @@ def view_heatmap() -> Response:
             urcrnrlon=lon_max + lon_padding,
             resolution='f'
         )
-        mapamundi.drawcoastlines(linewidth=3)
+        mapamundi.drawcoastlines(linewidth=1)
         mapamundi.drawcountries(linewidth=3)
         mapamundi.drawstates(linestyle="dashed")
 

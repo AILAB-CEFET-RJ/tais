@@ -6,10 +6,8 @@ from services.file_service import normalize_timestamps
 from flask import Response,jsonify,request
 
 def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None, bbox=None) -> Response:
-    column_names = [
-        'vesselId', 'long', 'lat', 'rumo', 
-        'velocidade', 'timestamp'
-    ]
+    #column_names = ['vesselId', 'long', 'lat', 'rumo', 'velocidade', 'timestamp']
+    column_names = ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long']
     
     try:
         df = pd.read_csv(csv_file_path, header=None, names=column_names)

@@ -5,8 +5,9 @@ heatmap_bp = Blueprint("heatmap", __name__)
 
 @heatmap_bp.route("/heatmap_csv", methods=["GET"])
 def get_heatmap_from_csv():
-    csv_file = "resources/dataset-09-29-recorte.csv"
+    #csv_file = "resources/dataset-09-29-recorte.csv"
     #csv_file = "testee.csv"
+    csv_file = "resources/single_t_data/IHS-AIS-771438658.csv"
     vessel_id = request.args.get("vesselId")
     start_time = request.args.get("startTime")
     end_time = request.args.get("endTime")
