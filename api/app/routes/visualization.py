@@ -8,6 +8,7 @@ from routes.heatmap import get_heatmap_from_csv
 from flask import Blueprint, request, Response
 from mpl_toolkits.basemap import Basemap
 import numpy as np
+from random import random
 
 # Defina o caminho para salvar as imagens
 IMAGE_SAVE_DIR = "img"
@@ -17,9 +18,19 @@ visualization_bp = Blueprint("visualization", __name__)
 def view_heatmap() -> Response:
     # Gera os dados do heatmap
     data = get_heatmap_from_csv().json
-    density = np.array(data["density_array"])
-    if density is None or density.size == 0:
+    coordinates = list((tuple(c) for c in data["coordinates"]))
+    if coordinates is None or len(coordinates) == 0:
         return Response("Erro: Dados de densidade não estão disponíveis.", status=400)
+    
+    routes = {}
+
+    for line in coordinates:
+        if list(routes.keys()).count(line[2])==1:
+            routes[line[2]].append((line[0],line[1]))
+        else:
+            routes[line[2]]=[]
+    # from flask import jsonify
+    # return jsonify(routes)
 
     # Verificar limites
     lat_min = data["min_latitude"]
@@ -70,21 +81,20 @@ def view_heatmap() -> Response:
         mapamundi.drawcoastlines(linewidth=1)
         mapamundi.drawcountries(linewidth=3)
         mapamundi.drawstates(linestyle="dashed")
-
-        # Gerar coordenadas para o heatmap
-        lons = np.linspace(lon_min, lon_max, density.shape[1])
-        lats = np.linspace(lat_min, lat_max, density.shape[0])
-        lon_grid, lat_grid = np.meshgrid(lons, lats)
-
-        # Sobrepor heatmap ao mapa
-        heatmap = mapamundi.pcolormesh(lon_grid, lat_grid, density, cmap='bwr', shading='auto', latlon=True)
-
         mapamundi.fillcontinents(color='lightgreen', lake_color='blue')
         mapamundi.drawmapboundary(fill_color="blue")
 
-        escala = plt.colorbar(heatmap)
-        escala.set_label("Density", fontsize=20)
-        escala.set_ticks([density.max(), 0], labels=["barcos", "mar"], size=20)
+        # Sobrepor scatterplot de cada embarcação ao mapa
+        for id, coords in routes.items():
+            color = (random(),random(),random())
+            try:
+                lats, lons = zip(*coords)
+            except:
+                print("had an issue processing: ",id,coords)
+                continue
+            x, y = mapamundi(lons, lats)
+            mapamundi.scatter(x,y,color=color, marker="o",zorder=5, s=10)
+
         plt.title("Mapa de Calor das Rotas da Embarcação", fontsize=24)
         plt.xlabel("Longitude", fontsize=20)
         plt.ylabel("Latitude", fontsize=20)
