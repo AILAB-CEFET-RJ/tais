@@ -9,6 +9,7 @@ from flask import Blueprint, request, Response
 from mpl_toolkits.basemap import Basemap
 import numpy as np
 from random import random
+import colorsys
 
 # Defina o caminho para salvar as imagens
 IMAGE_SAVE_DIR = "img"
@@ -86,10 +87,18 @@ def view_heatmap() -> Response:
 
         # Sobrepor scatterplot de cada embarcação ao mapa
         for id, coords in routes.items():
-            color = (random(),random(),random())
+            # 0.5 a 0.7 é hue de azul
+            color = [random(),random(),random()]
+            while color[0] >= 0.5 and color[0] < 0.7:
+                color[0]=random()
+            while color[1] < 0.7:
+                color[1]=random()
+            while color[2] < 0.5:
+                color[2]=random()
+            color = colorsys.hsv_to_rgb(*color)
             lats, lons = zip(*coords)
             x, y = mapamundi(lons, lats)
-            mapamundi.scatter(x,y,color=color, marker="o",zorder=5, s=10)
+            mapamundi.plot(x,y,color=color, marker=None,zorder=5,lw=1)
 
         plt.title("Mapa de Calor das Rotas da Embarcação", fontsize=24)
         plt.xlabel("Longitude", fontsize=20)
