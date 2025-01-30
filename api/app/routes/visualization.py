@@ -28,7 +28,7 @@ def view_heatmap() -> Response:
         if list(routes.keys()).count(line[2])==1:
             routes[line[2]].append((line[0],line[1]))
         else:
-            routes[line[2]]=[]
+            routes[line[2]]=[(line[0],line[1])]
     # from flask import jsonify
     # return jsonify(routes)
 
@@ -87,11 +87,7 @@ def view_heatmap() -> Response:
         # Sobrepor scatterplot de cada embarcação ao mapa
         for id, coords in routes.items():
             color = (random(),random(),random())
-            try:
-                lats, lons = zip(*coords)
-            except:
-                print("had an issue processing: ",id,coords)
-                continue
+            lats, lons = zip(*coords)
             x, y = mapamundi(lons, lats)
             mapamundi.scatter(x,y,color=color, marker="o",zorder=5, s=10)
 
