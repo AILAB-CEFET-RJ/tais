@@ -105,7 +105,7 @@ def view_heatmap() -> Response:
         plt.ylabel("Latitude", fontsize=20)
 
         os.makedirs(IMAGE_SAVE_DIR, exist_ok=True)
-        image_path = os.path.join(IMAGE_SAVE_DIR, "heatmap.svg")
+        image_path = os.path.join(IMAGE_SAVE_DIR, "routes.svg")
         plt.savefig(image_path, format="svg")
 
         # Gera a imagem em memória para resposta HTTP
