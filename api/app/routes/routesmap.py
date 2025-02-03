@@ -1,10 +1,10 @@
 from flask import Blueprint, request
-from services.heatmap_service import calculate_heatmap_data_from_csv
+from services.routesmap_service import calculate_routesmap_data_from_csv
 
-heatmap_bp = Blueprint("heatmap", __name__)
+routesmap_bp = Blueprint("routesmap", __name__)
 
-@heatmap_bp.route("/heatmap_csv", methods=["GET"])
-def get_heatmap_from_csv():
+@routesmap_bp.route("/routesmap_csv", methods=["GET"])
+def get_routesmap_from_csv():
     csv_file = "resources/dataset-09-29-recorte.csv"
     #csv_file = "resources/ship_trajectory.csv"
     #csv_file = "resources/single_t_data/IHS-AIS-256298000.csv" # esse é ok
@@ -15,4 +15,4 @@ def get_heatmap_from_csv():
     bbox = request.args.get("bbox")
     print("Recebido bbox:", bbox)
 
-    return calculate_heatmap_data_from_csv(csv_file, vessel_id, start_time, end_time, bbox)
+    return calculate_routesmap_data_from_csv(csv_file, vessel_id, start_time, end_time, bbox)

@@ -5,7 +5,7 @@ import pandas as pd
 from services.file_service import normalize_timestamps
 from flask import Response,jsonify,request
 
-def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None, bbox=None) -> Response:
+def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None, bbox=None) -> Response:
     #o primeiro column_names é para dataset-09-29-recorte.csv, 
     # para todos os demais csvs use o column_names debaixo, porque a ordem das colunas é diferente neles
     column_names = ['vesselId', 'long', 'lat', 'rumo', 'velocidade', 'timestamp']
@@ -42,7 +42,6 @@ def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=No
     coordenadas_embarcacao = df[['lat', 'long','vesselId']].to_numpy()
     coordenadas_embarcacao = list(tuple((line)) for line in coordenadas_embarcacao)
 
-
     if len(coordenadas_embarcacao) == 0: # ver se existem dados suficientes pra fazer um plot
         return jsonify({
             "error": "Nenhum dado válido encontrado para os filtros aplicados.",
@@ -53,17 +52,12 @@ def calculate_heatmap_data_from_csv(csv_file_path, vessel_id=None, start_time=No
             "max_longitude": lon_max,
         })
 
-    resolution = 50  # resolução do heatmap em si
+    resolution = 50 
     # aqui vai ajustar os limites do grid com base na bbox (se tiver)
     lat_grid = np.linspace(lat_min, lat_max, resolution)
     lon_grid = np.linspace(lon_min, lon_max, resolution)
     lat_mesh, lon_mesh = np.meshgrid(lat_grid, lon_grid)
     grid_points = np.vstack([lat_mesh.ravel(), lon_mesh.ravel()])
-
-    # Calcular KDE com os pontos filtrados
-    # kde = gaussian_kde(coordenadas_embarcacao.T, bw_method='silverman')
-    # density = kde(grid_points) # nao usa mais um grid global
-    # density = density.reshape(lat_mesh.shape)
 
     return jsonify({
         "coordinates": coordenadas_embarcacao,#density.T.tolist(),  # Transposto para corresponder ao formato esperado

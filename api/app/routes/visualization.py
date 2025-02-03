@@ -4,7 +4,7 @@ matplotlib.use("Agg")  # Define o backend para uso não interativo
 import matplotlib.pyplot as plt
 import io
 from flask import Response
-from routes.heatmap import get_heatmap_from_csv
+from routes.routesmap import get_routesmap_from_csv
 from flask import Blueprint, request, Response
 from mpl_toolkits.basemap import Basemap
 import numpy as np
@@ -16,9 +16,9 @@ IMAGE_SAVE_DIR = "img"
 visualization_bp = Blueprint("visualization", __name__)
 
 @visualization_bp.route("/", methods=["GET"])
-def view_heatmap() -> Response:
-    # Gera os dados do heatmap
-    data = get_heatmap_from_csv().json
+def view_routesmap() -> Response:
+    # Gera os dados do routesmap
+    data = get_routesmap_from_csv().json
     coordinates = list((tuple(c) for c in data["coordinates"]))
     if coordinates is None or len(coordinates) == 0:
         return Response("Erro: Dados de densidade não estão disponíveis.", status=400)
@@ -67,7 +67,7 @@ def view_heatmap() -> Response:
             lon_padding = max((lon_max - lon_min),0)/4
             lat_padding = lon_padding
 
-    # Criação do heatmap
+    # Criação do routesmap
     fig = plt.figure(figsize=(10, 10))
     try:
         # criando recorte contendo rota encontrada, com no mínimo 9 graus em latitude e longitude, do mapa mundi usando projeção cilindrica de Miller
