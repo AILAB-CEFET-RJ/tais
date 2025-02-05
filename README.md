@@ -8,10 +8,11 @@ Tool for analisys of AIS data
    - [Para executar no ambiente de Desenvolvimento (DEV)](#para-executar-no-ambiente-de-desenvolvimento-dev)
    - [Alternativamente para rodar a aplicação sem o encapsulamento do Docker](#alternativamente-para-rodar-a-aplicação-sem-o-encapsulamento-do-docker)
 2. [Instruções sobre a utilização da API](#instruções-sobre-a-utilização-da-api)
-   - [Mapa de Calor (Heatmap) (GET)](#1-mapa-de-calor-heatmap--get-)
-   - [Dados do Mapa de Calor (Heatmap) (GET)](#2-dados-do-mapa-de-calor-heatmap--get-)
-   - [Filtragem por Intervalo de Tempo (GET)](#3-filtragem-por-intervalo-de-tempo--get-)
-   - [Retorno de Embarcação por Identificador Único (GET)](#4-retorno-de-embarcação-por-identificador-único--get-)
+   - [Mapa de Rotas (GET)](#1-mapa-de-rotas--get-)
+   - [Mapa de Rotas com Bounding-Box (GET)](#2-mapa-de-rotas-com-bounding-box--get-)
+   - [Dados do Mapa de Rotas (GET)](#3-dados-do-mapa-de-rotas--get-)
+   - [Filtragem por Intervalo de Tempo (GET)](#4-filtragem-por-intervalo-de-tempo--get-)
+   - [Retorno de Embarcação por Identificador Único (GET)](#5-retorno-de-embarcação-por-identificador-único--get-)
 3. [Formato de dados AIS utilizado no Tais](#formato-de-dados-ais-utilizado-no-tais)
    - [Organização das pastas](#organização-das-pastas)
    - [Processamento dos dados CSV](#processamento-dos-dados-csv)
@@ -36,7 +37,7 @@ Tool for analisys of AIS data
 
 ## Instruções sobre a utilização da API
 
-### 1. Mapa de Calor (Heatmap) ( GET )
+### 1. Mapa de Rotas ( GET )
 
 - **Rota**: /visualization
 
@@ -46,7 +47,7 @@ Tool for analisys of AIS data
 disponíveis. Este mapa de calor pode ser utilizado para identificar áreas de alta ou
 baixa densidade de tráfego marítimo. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
 
-### 2. Mapa de Calor (Heatmap) com bounding-box ( GET )
+### 2. Mapa de Rotas com Bounding-Box ( GET )
 
 - **Rota**: /visualization
 
@@ -55,7 +56,7 @@ baixa densidade de tráfego marítimo. Pode-se especificar o vesselId da embarca
 - **Descrição**: Permite a visualização de um mapa de calor baseado nos dados AIS
 disponíveis, tendo em consideração uma área delimitada por dois pares de coordenadas indicadas pelo usuário. Este mapa de calor pode ser utilizado para identificar áreas de alta ou baixa densidade de tráfego marítimo. Assim como no item anterior, pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
 
-### 3. Dados do Mapa de Calor (Heatmap) ( GET )
+### 3. Dados do Mapa de Rotas ( GET )
 
 - **Rota**: /api/heatmap_csv
 
@@ -96,12 +97,12 @@ A aplicação utiliza o formato JSON para representar as informações de rastre
 
 2. ```routes/```: Contém os arquivos responsáveis pelas rotas da aplicação Flask, divididas por responsabilidade:
     **home.py**: Rota inicial e informações gerais da API.
-    **heatmap.py**: Rotas relacionadas aos mapas de calor.
+    **routesmap.py**: Rotas relacionadas aos mapas de calor.
     **vessel.py**: Rotas para consultas e filtragens de dados de embarcações.
     **visualization.py**: Rotas para visualização dos dados
 
 3. ```services/```: Implementa a lógica da aplicação, separando as funcionalidades em serviços reutilizáveis:
-    **heatmap_service.py**: Funções para cálculos de heatmaps.
+    **routesmap_service.py**: Funções para cálculos de mapas de rotas.
     **vessel_service.py**: Manipulação de dados relacionados a embarcações.
     **file_service.py**: Normalização de timestamps e conversões de dados.
 
