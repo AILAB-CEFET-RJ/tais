@@ -1,15 +1,21 @@
 import numpy as np
-from scipy.stats import gaussian_kde
-import matplotlib.pyplot as plt
 import pandas as pd
 from services.file_service import normalize_timestamps
-from flask import Response,jsonify,request
+from flask import Response,jsonify
 
 def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None, bbox=None) -> Response:
-    #o primeiro column_names é para dataset-09-29-recorte.csv, 
-    # para todos os demais csvs use o column_names debaixo, porque a ordem das colunas é diferente neles
-    column_names = ['vesselId', 'long', 'lat', 'rumo', 'velocidade', 'timestamp']
-    # column_names = ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long']
+    column_names_mapping = {
+        "dataset-09-29-recorte.csv": ['vesselId', 'long', 'lat', 'rumo', 'velocidade', 'timestamp'],
+        "ship_trajectory.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long'],
+        "IHS-AIS-256298000.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long'],
+        "IHS-AIS-255915766.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long']
+    }
+
+    file_name = csv_file_path.split("/")[-1]
+    column_names = column_names_mapping.get(file_name, [])
+
+    if not column_names:
+        return jsonify({"error": f"Nome do arquivo '{file_name}' não encontrado no mapeamento de colunas."})
     
     try:
         df = pd.read_csv(csv_file_path, header=None, names=column_names)
@@ -60,7 +66,7 @@ def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=
     grid_points = np.vstack([lat_mesh.ravel(), lon_mesh.ravel()])
 
     return jsonify({
-        "coordinates": coordenadas_embarcacao,#density.T.tolist(),  # Transposto para corresponder ao formato esperado
+        "coordinates": coordenadas_embarcacao, # Transposto para corresponder ao formato esperado
         "min_latitude": lat_min,
         "max_latitude": lat_max,
         "min_longitude": lon_min,

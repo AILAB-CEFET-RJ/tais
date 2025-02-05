@@ -30,8 +30,6 @@ def view_routesmap() -> Response:
             routes[line[2]].append((line[0],line[1]))
         else:
             routes[line[2]]=[(line[0],line[1])]
-    # from flask import jsonify
-    # return jsonify(routes)
 
     # Verificar limites
     lat_min = data["min_latitude"]

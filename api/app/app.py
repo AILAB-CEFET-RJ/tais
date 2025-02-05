@@ -8,7 +8,6 @@ from routes.visualization import visualization_bp
 app = Flask(__name__)
 CORS(app)
 
-#! definicao das rotas
 app.register_blueprint(home_bp, url_prefix="/")
 app.register_blueprint(routesmap_bp, url_prefix="/api")
 app.register_blueprint(vessel_bp, url_prefix="/vessel")
