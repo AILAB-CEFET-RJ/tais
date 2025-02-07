@@ -43,9 +43,7 @@ Tool for analisys of AIS data
 
 - **Exemplo**: <http://127.0.0.1:5000/visualization?vesselId=IHS-AIS-209016000&startTime=2024-08-29%2000:08:54&endTime=2024-08-29%2023:56:13>
 
-- **Descrição**: Permite a visualização de um mapa de calor baseado nos dados AIS
-disponíveis. Este mapa de calor pode ser utilizado para identificar áreas de alta ou
-baixa densidade de tráfego marítimo. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
+- **Descrição**: Permite a visualização de um mapa baseado nos dados AIS disponíveis. Este mapa pode ser utilizado para identificar as diferentes rotas de tráfego marítimo. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
 
 ### 2. Mapa de Rotas com Bounding-Box ( GET )
 
@@ -53,8 +51,7 @@ baixa densidade de tráfego marítimo. Pode-se especificar o vesselId da embarca
 
 - **Exemplo**: <http://127.0.0.1:5000/visualization?vesselId=IHS-AIS-100001974&startTime=2024-08-29%2013:01:21&endTime=2024-08-29%2023:31:17&bbox=-23.116365,-43.304672,-22.816061,-42.867279>
 
-- **Descrição**: Permite a visualização de um mapa de calor baseado nos dados AIS
-disponíveis, tendo em consideração uma área delimitada por dois pares de coordenadas indicadas pelo usuário. Este mapa de calor pode ser utilizado para identificar áreas de alta ou baixa densidade de tráfego marítimo. Assim como no item anterior, pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
+- **Descrição**: Permite a visualização de um mapa baseado nos dados AIS disponíveis, tendo em consideração uma área delimitada por dois pares de coordenadas indicadas pelo usuário. Este mapa pode ser utilizado para identificar áreas de alta ou baixa densidade de tráfego marítimo. Assim como no item anterior, pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise.
 
 ### 3. Dados do Mapa de Rotas ( GET )
 
@@ -62,8 +59,7 @@ disponíveis, tendo em consideração uma área delimitada por dois pares de coo
 
 - **Exemplo**: <http://127.0.0.1:5000/api/routesmap_csv?vesselId=IHS-AIS-209016000&startTime=2024-08-29%2000:08:54&endTime=2024-08-29%2023:56:13>
 
-- **Descrição**: Retorna os dados puros de um mapa de calor baseado nos dados AIS
-disponíveis. Estes dados podem ser usados na construção de um mapa de calor ou simplesmente para análise direta. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
+- **Descrição**: Retorna os dados puros de rotas com base nos dados AIS disponíveis. Estes dados podem ser usados na construção de um mapa de rotas simplesmente para análise direta. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise.
 
 ## Formato de dados AIS utilizado no Tais
 
@@ -75,24 +71,22 @@ A aplicação utiliza o formato JSON para representar as informações de rastre
 
 2. ```routes/```: Contém os arquivos responsáveis pelas rotas da aplicação Flask, divididas por responsabilidade:
     **home.py**: Rota inicial e informações gerais da API.
-    **routesmap.py**: Rotas relacionadas aos mapas de calor.
-    **vessel.py**: Rotas para consultas e filtragens de dados de embarcações.
+    **routesmap.py**: Rotas relacionadas aos mapas de rota de embarcação.
     **visualization.py**: Rotas para visualização dos dados
 
 3. ```services/```: Implementa a lógica da aplicação, separando as funcionalidades em serviços reutilizáveis:
     **routesmap_service.py**: Funções para cálculos de mapas de rotas.
-    **vessel_service.py**: Manipulação de dados relacionados a embarcações.
     **file_service.py**: Normalização de timestamps e conversões de dados.
 
 4. ```resources/```: Contém os arquivos de dados usados pela aplicação, como o CSV com as trajetórias.
 
 ### Processamento dos dados CSV
 
-A aplicação utiliza o arquivo ```historico_acompanhamentos_24horas.csv```, que contém dados históricos de rastreamento. O CSV é lido e processado, permitindo a consulta de dados filtrados por timestamp ou ID da embarcação. Quando necessário, o arquivo é ordenado para garantir que os dados sejam manipulados de forma cronológica.
+A aplicação utiliza arquivos ```.csv``` contidos na pasta ```resources/```, que contém dados históricos de rastreamento. O CSV é lido e processado, permitindo a consulta de dados filtrados por timestamp, bounding-box ou ID da embarcação.
 
 #### Campos do CSV
 
-O arquivo ```historico_acompanhamentos_24horas.csv``` possui as seguintes colunas principais:
+Os arquivos em questão possuem as seguintes colunas principais:
 
 | **Coluna**   | **Descrição**                                  |
 |--------------|------------------------------------------------|
