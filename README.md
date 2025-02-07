@@ -13,8 +13,6 @@ Tool for analisys of AIS data
     - [1. Mapa de Rotas ( GET )](#1-mapa-de-rotas--get-)
     - [2. Mapa de Rotas com Bounding-Box ( GET )](#2-mapa-de-rotas-com-bounding-box--get-)
     - [3. Dados do Mapa de Rotas ( GET )](#3-dados-do-mapa-de-rotas--get-)
-    - [4. Filtragem por Intervalo de Tempo ( GET )](#4-filtragem-por-intervalo-de-tempo--get-)
-    - [5. Retorno de Embarcação por Identificador Único ( GET )](#5-retorno-de-embarcação-por-identificador-único--get-)
   - [Formato de dados AIS utilizado no Tais](#formato-de-dados-ais-utilizado-no-tais)
     - [Organização das pastas](#organização-das-pastas)
     - [Processamento dos dados CSV](#processamento-dos-dados-csv)
@@ -66,28 +64,6 @@ disponíveis, tendo em consideração uma área delimitada por dois pares de coo
 
 - **Descrição**: Retorna os dados puros de um mapa de calor baseado nos dados AIS
 disponíveis. Estes dados podem ser usados na construção de um mapa de calor ou simplesmente para análise direta. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise
-
-### 4. Filtragem por Intervalo de Tempo ( GET )
-
-- Baixe o arquivo ```historico_acompanhamentos_24horas.csv``` e coloque-o no mesmo diretório que o ```app.py```.
-
-- Ao rodar a consulta, será gerado um arquivo ordenado chamado ```sorted_historico_acompanhamentos_24horas.csv```.
-
-- **Rota**: <http://127.0.0.1:5000/vessel/timestamp/start/end>
-
-- **Exemplo**: <http://127.0.0.1:5000/vessel/timestamp/2024-08-13%2000:00:00/2024-08-13%2000:10:00>
-
-- **Descrição**: Filtra as observações de embarcações por um intervalo de tempo específico. Essa funcionalidade é útil para análises temporais. No exemplo, as observações entre meia-noite e 00:10 do dia 13 de agosto de 2024 são filtradas.
-
-### 5. Retorno de Embarcação por Identificador Único ( GET )
-
-- Para fazer essa consulta, também é necessário baixar o arquivo ```historico_acompanhamentos_24horas.csv``` e colocá-lo no mesmo diretório que o ```app.py```. Se isso não foi feito anteriormente, é necessário realizá-lo agora.
-
-- **Rota**: <http://127.0.0.1:5000/vessel/vessel_id>
-
-- **Exemplo**: <http://127.0.0.1:5000/vessel/IHS-AIS-205188000>
-
-- **Descrição**: Esta funcionalidade permite retornar os dados de uma embarcação específica através de seu identificador único. É útil para acessar rapidamente as informações detalhadas de uma embarcação.
 
 ## Formato de dados AIS utilizado no Tais
 
