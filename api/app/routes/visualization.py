@@ -98,7 +98,7 @@ def view_routesmap() -> Response:
             x, y = mapamundi(lons, lats)
             mapamundi.plot(x,y,color=color, marker=None,zorder=5,lw=1)
 
-        plt.title("Mapa de Calor das Rotas da Embarcação", fontsize=24)
+        plt.title("Mapa de Rotas de Embarcação", fontsize=24)
         plt.xlabel("Longitude", fontsize=20)
         plt.ylabel("Latitude", fontsize=20)
 
