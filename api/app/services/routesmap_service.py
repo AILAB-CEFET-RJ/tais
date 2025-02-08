@@ -51,7 +51,7 @@ def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=
     if len(coordenadas_embarcacao) == 0: # ver se existem dados suficientes pra fazer um plot
         return jsonify({
             "error": "Nenhum dado válido encontrado para os filtros aplicados.",
-            "density_array": [],
+            "coordinates":[],
             "min_latitude": lat_min,
             "max_latitude": lat_max,
             "min_longitude": lon_min,

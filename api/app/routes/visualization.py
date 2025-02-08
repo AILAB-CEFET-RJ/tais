@@ -21,7 +21,7 @@ def view_routesmap() -> Response:
     data = get_routesmap_from_csv().json
     coordinates = list((tuple(c) for c in data["coordinates"]))
     if coordinates is None or len(coordinates) == 0:
-        return Response("Erro: Dados de densidade não estão disponíveis.", status=400)
+        return Response(f"Erro: Dados de densidade não estão disponíveis.\n{data['error']}", status=400)
     
     routes = {}
 
