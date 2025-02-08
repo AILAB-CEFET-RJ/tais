@@ -15,12 +15,12 @@ def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=
     column_names = column_names_mapping.get(file_name, [])
 
     if not column_names:
-        return jsonify({"error": f"Nome do arquivo '{file_name}' não encontrado no mapeamento de colunas."})
+        return jsonify({"error": f"Nome do arquivo '{file_name}' não encontrado no mapeamento de colunas.","coordinates":[]})
     
     try:
         df = pd.read_csv(csv_file_path, header=None, names=column_names)
     except Exception as e:
-        return {"error": f"Erro ao carregar o arquivo CSV: {str(e)}"}
+        return jsonify({"error": f"Erro ao carregar o arquivo CSV: {str(e)}","coordinates":[]})
 
     df = normalize_timestamps(df) # remover os milissegundos das datas pra n ocorrer erros
     df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce') # Converter timestamp para datetime
@@ -29,13 +29,21 @@ def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=
         df = df[df['vesselId'] == vessel_id]
     
     if start_time and end_time: # filtra por intervalo de tempo
-        start_time = pd.to_datetime(start_time, format='%Y-%m-%d %H:%M:%S')
-        end_time = pd.to_datetime(end_time, format='%Y-%m-%d %H:%M:%S')
-        df = df[(df['timestamp'] >= start_time) & (df['timestamp'] <= end_time)]
+        try:
+            start_time = pd.to_datetime(start_time, format='%Y-%m-%d %H:%M:%S')
+            end_time = pd.to_datetime(end_time, format='%Y-%m-%d %H:%M:%S')
+            df = df[(df['timestamp'] >= start_time) & (df['timestamp'] <= end_time)]
+        except:
+            return jsonify({"error": f"Tempo deve estar no formato AAAA-MM-DD HH:MM:SS", "coordinates":[]})
 
     if bbox:
         # filtrar o dataframe de forma a incluir apenas os pontos da bbox que a gente quer
-        lat_min, lon_min, lat_max, lon_max = map(float, bbox.split(','))
+        try:
+            lat_min, lon_min, lat_max, lon_max = map(float, bbox.split(','))
+        except:
+            lat_min, lon_min, lat_max, lon_max = 0,0,0,0
+        if lat_min>=lat_max or lon_min>=lon_max:
+            return jsonify({"error": f"Bounding box deve estar no formato 'lat_min', 'lon_min', 'lat_max', 'lon_max'", "coordinates":[]})
         df = df[(df['lat'] >= lat_min) & (df['lat'] <= lat_max) &
                 (df['long'] >= lon_min) & (df['long'] <= lon_max)]
     else:

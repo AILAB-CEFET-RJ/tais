@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, Response
 from services.routesmap_service import calculate_routesmap_data_from_csv
 
 routesmap_bp = Blueprint("routesmap", __name__)
@@ -15,4 +15,9 @@ def get_routesmap_from_csv():
     bbox = request.args.get("bbox")
     print("Recebido bbox:", bbox)
 
-    return calculate_routesmap_data_from_csv(csv_file, vessel_id, start_time, end_time, bbox)
+    response = calculate_routesmap_data_from_csv(csv_file, vessel_id, start_time, end_time, bbox)
+    coordinates = list((tuple(c) for c in response.json["coordinates"]))
+    if coordinates is None or len(coordinates) == 0:
+        return Response(f"Erro: {response['error']}", status=400)
+    else:
+        return response
