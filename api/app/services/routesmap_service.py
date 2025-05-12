@@ -8,7 +8,8 @@ def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=
         "dataset-09-29-recorte.csv": ['vesselId', 'long', 'lat', 'rumo', 'velocidade', 'timestamp'],
         "ship_trajectory.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long'],
         "IHS-AIS-256298000.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long'],
-        "IHS-AIS-255915766.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long']
+        "IHS-AIS-255915766.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long'],
+        "combined_routes 1(in).csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long']
     }
 
     file_name = csv_file_path.split("/")[-1]
