@@ -3,69 +3,94 @@ import matplotlib
 matplotlib.use("Agg")  # Define o backend para uso não interativo
 import matplotlib.pyplot as plt
 import io
-from flask import Response
-from routes.routesmap import get_routesmap_from_csv
-from flask import Blueprint, request, Response
+from flask import Response, Blueprint, request
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-import numpy as np
-from random import random
 import colorsys
+from random import random
+from routes.routesmap import get_routesmap_from_csv
 
-# Defina o caminho para salvar as imagens
+# Diretório para salvar imagem
 IMAGE_SAVE_DIR = "img"
+
+# Tipos de embarcação suportados
+ship_type_dict = {
+    0: "Cargo",
+    1: "Cruise",
+    2: "Military",
+    3: "Offshore",
+    4: "Passenger",
+    5: "Tanker",
+    6: "Tug",
+    7: "Fishing"
+}
+
 visualization_bp = Blueprint("visualization", __name__)
 
 @visualization_bp.route("/", methods=["GET"])
 def view_routesmap() -> Response:
-    # Gera os dados do routesmap
+    # Obtém os dados do CSV
     data = get_routesmap_from_csv().json
     coordinates = list((tuple(c) for c in data["coordinates"]))
-    if coordinates is None or len(coordinates) == 0:
+
+    if not coordinates:
         return Response(f"Erro: {data['error']}", status=400)
 
-    routes = {}
-    for line in coordinates:
-        if line[2] in routes:
-            routes[line[2]].append((line[0], line[1]))
-        else:
-            routes[line[2]] = [(line[0], line[1])]
-    # Verificar limites
+    # Obtem os limites geográficos
     lat_min = data["min_latitude"]
     lat_max = data["max_latitude"]
     lon_min = data["min_longitude"]
     lon_max = data["max_longitude"]
 
-    # Obter parâmetros bbox opcionais
+    # Lê o filtro opcional do tipo de embarcação
+    filter_ship_type = request.args.get("ship_type")
+    if filter_ship_type is not None:
+        try:
+            filter_ship_type = int(filter_ship_type)
+            ship_type_name = ship_type_dict.get(filter_ship_type)
+            if not ship_type_name:
+                return Response("Tipo de embarcação inválido.", status=400)
+        except ValueError:
+            return Response("Parâmetro ship_type inválido (deve ser um número).", status=400)
+    else:
+        ship_type_name = None
+
+    # Filtra e organiza as rotas
+    routes = {}
+    for line in coordinates:
+        # Espera-se: latitude, longitude, vessel_id, vessel_type
+        if len(line) < 4:
+            continue  # pula linhas incompletas
+
+        lat, lon, vessel_id, vessel_type = line
+
+        # Aplica o filtro se especificado
+        if ship_type_name and vessel_type != ship_type_name:
+            continue
+
+        if vessel_id in routes:
+            routes[vessel_id].append((lat, lon))
+        else:
+            routes[vessel_id] = [(lat, lon)]
+
+    # Processa bounding box
     bbox = request.args.get("bbox")
     if bbox:
-        print("Recebido bbox:", bbox)
         try:
             bbox = list(map(float, bbox.split(',')))
-            assert len(bbox) == 4, "Bounding box deve conter exatamente 4 valores (lat_min, lon_min, lat_max, lon_max)"
+            assert len(bbox) == 4, "Bounding box deve conter 4 valores"
             lat_min, lon_min, lat_max, lon_max = bbox
-
-            if not (-90 <= lat_min <= 90 and -90 <= lat_max <= 90):
-                raise ValueError("As coordenadas de latitude devem estar no intervalo de -90 a 90.")
-            if not (-180 <= lon_min <= 180 and -180 <= lon_max <= 180):
-                raise ValueError("As coordenadas de longitude devem estar no intervalo de -180 a 180.")
-            assert lat_min < lat_max and lon_min < lon_max, "Coordenadas da bounding box inválidas"
-        except (ValueError, AssertionError) as e:
+            assert lat_min < lat_max and lon_min < lon_max
+        except Exception as e:
             return Response(f"Erro no formato da bounding box: {str(e)}", status=400)
         lat_padding, lon_padding = 0, 0
     else:
-        # Calcular padding adequado (ajustado)
-        if abs((lat_max - lat_min)) > abs((lon_max - lon_min)):
-            lat_padding = max((lat_max - lat_min), 0) / 4
-            lon_padding = lat_padding
-        else:
-            lon_padding = max((lon_max - lon_min), 0) / 4
-            lat_padding = lon_padding
+        lat_padding = (lat_max - lat_min) / 4
+        lon_padding = (lon_max - lon_min) / 4
 
-    # Criação do routesmap
+    # Cria a imagem
     fig = plt.figure(figsize=(10, 10))
     try:
-        # criando recorte contendo rota encontrada, com no mínimo 9 graus em latitude e longitude, do mapa mundi usando projeção cilindrica de Miller
         ax = plt.axes(projection=ccrs.Miller())
         ax.set_extent([lon_min - lon_padding, lon_max + lon_padding,
                        lat_min - lat_padding, lat_max + lat_padding], crs=ccrs.PlateCarree())
@@ -75,9 +100,8 @@ def view_routesmap() -> Response:
         ax.add_feature(cfeature.COASTLINE, linewidth=1)
         ax.add_feature(cfeature.BORDERS, linewidth=3)
         ax.add_feature(cfeature.STATES, linestyle='--')
-        # Sobrepor scatterplot de cada embarcação ao mapa
-        for id, coords in routes.items():
-            # 0.5 a 0.7 é hue de azul
+
+        for vessel_id, coords in routes.items():
             color = [random(), random(), random()]
             while color[0] >= 0.5 and color[0] < 0.7:
                 color[0] = random()
@@ -86,6 +110,7 @@ def view_routesmap() -> Response:
             while color[2] < 0.5:
                 color[2] = random()
             color = colorsys.hsv_to_rgb(*color)
+
             lats, lons = zip(*coords)
             ax.plot(lons, lats, color=color, transform=ccrs.PlateCarree(), linewidth=1, zorder=5)
 
@@ -96,12 +121,12 @@ def view_routesmap() -> Response:
         os.makedirs(IMAGE_SAVE_DIR, exist_ok=True)
         image_path = os.path.join(IMAGE_SAVE_DIR, "routes.svg")
         plt.savefig(image_path, format="svg")
-        # Gera a imagem em memória para resposta HTTP
+
         img = io.BytesIO()
         plt.savefig(img, format="svg")
         img.seek(0)
-    finally:
-        plt.close(fig)  # Garante que o recurso será liberado
 
+    finally:
+        plt.close(fig)
 
     return Response(img.getvalue(), mimetype="image/svg+xml")
