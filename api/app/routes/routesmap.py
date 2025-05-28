@@ -7,9 +7,9 @@ routesmap_bp = Blueprint("routesmap", __name__)
 def get_routesmap_from_csv():
     #csv_file = "resources/dataset-09-29-recorte.csv"
     #csv_file = "resources/ship_trajectory.csv"
-    csv_file = "resources/single_t_data/IHS-AIS-256298000.csv"
+    #csv_file = "resources/single_t_data/IHS-AIS-256298000.csv"
     #csv_file = "resources/single_t_data/IHS-AIS-15.csv"
-    #csv_file ="resources/single_t_data/combined_routes.csv"
+    csv_file ="resources/single_t_data/combined_routes.csv"
     #csv_file = "resources/single_t_data/IHS-AIS-255915766.csv"
     #csv_file = "resources/single_t_data/combined_routes 1(in).csv"
     vessel_id = request.args.get("vesselId")

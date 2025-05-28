@@ -43,7 +43,7 @@ def view_routesmap_heatmap() -> Response:
         return Response("Erro: Nenhuma coordenada recebida", status=400)
 
     ficticio_data = gerar_dados_ficticios_varias_rotas(coordinates, qtd_variacoes=1)
-    coordinates = ficticio_data["coordinates"]
+    coordinates = data["coordinates"]
 
     lat_min, lat_max = ficticio_data["min_latitude"], ficticio_data["max_latitude"]
     lon_min, lon_max = ficticio_data["min_longitude"], ficticio_data["max_longitude"]
