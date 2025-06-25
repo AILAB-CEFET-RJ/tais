@@ -13,18 +13,6 @@ from routes.routesmap import get_routesmap_from_csv
 # Diretório para salvar imagem
 IMAGE_SAVE_DIR = "img"
 
-# Tipos de embarcação suportados
-ship_type_dict = {
-    0: "Cargo",
-    1: "Cruise",
-    2: "Military",
-    3: "Offshore",
-    4: "Passenger",
-    5: "Tanker",
-    6: "Tug",
-    7: "Fishing"
-}
-
 visualization_bp = Blueprint("visualization", __name__)
 
 @visualization_bp.route("/", methods=["GET"])
@@ -36,42 +24,18 @@ def view_routesmap() -> Response:
     if not coordinates:
         return Response(f"Erro: {data['error']}", status=400)
 
+    routes = {}
+    for line in coordinates:
+        if line[2] in routes:
+            routes[line[2]].append((line[0], line[1]))
+        else:
+            routes[line[2]] = [(line[0], line[1])]
+            
     # Obtem os limites geográficos
     lat_min = data["min_latitude"]
     lat_max = data["max_latitude"]
     lon_min = data["min_longitude"]
     lon_max = data["max_longitude"]
-
-    # Lê o filtro opcional do tipo de embarcação
-    filter_ship_type = request.args.get("ship_type")
-    if filter_ship_type is not None:
-        try:
-            filter_ship_type = int(filter_ship_type)
-            ship_type_name = ship_type_dict.get(filter_ship_type)
-            if not ship_type_name:
-                return Response("Tipo de embarcação inválido.", status=400)
-        except ValueError:
-            return Response("Parâmetro ship_type inválido (deve ser um número).", status=400)
-    else:
-        ship_type_name = None
-
-    # Filtra e organiza as rotas
-    routes = {}
-    for line in coordinates:
-        # Espera-se: latitude, longitude, vessel_id, vessel_type
-        if len(line) < 4:
-            continue  # pula linhas incompletas
-
-        lat, lon, vessel_id, vessel_type = line
-
-        # Aplica o filtro se especificado
-        if ship_type_name and vessel_type != ship_type_name:
-            continue
-
-        if vessel_id in routes:
-            routes[vessel_id].append((lat, lon))
-        else:
-            routes[vessel_id] = [(lat, lon)]
 
     # Processa bounding box
     bbox = request.args.get("bbox")
@@ -101,7 +65,7 @@ def view_routesmap() -> Response:
         ax.add_feature(cfeature.BORDERS, linewidth=3)
         ax.add_feature(cfeature.STATES, linestyle='--')
 
-        for vessel_id, coords in routes.items():
+        for id, coords in routes.items():
             color = [random(), random(), random()]
             while color[0] >= 0.5 and color[0] < 0.7:
                 color[0] = random()

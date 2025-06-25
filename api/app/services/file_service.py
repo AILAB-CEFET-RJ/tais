@@ -3,7 +3,7 @@ import json
 
 def convert_df_to_json(df):
     json_data = []
-   
+
     for index, row in df.iterrows():
            
             entry = {

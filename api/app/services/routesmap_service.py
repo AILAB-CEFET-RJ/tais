@@ -3,11 +3,11 @@ import pandas as pd
 from services.file_service import normalize_timestamps
 from flask import Response,jsonify
 
-def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None, bbox=None) -> Response:
+def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=None, end_time=None, bbox=None, vessel_type=None) -> Response:
     column_names_mapping = {
         "dataset-09-29-recorte.csv": ['vesselId', 'long', 'lat', 'rumo', 'velocidade', 'timestamp'],
         "ship_trajectory.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long'],
-        "IHS-AIS-256298000.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long'],
+        "IHS-AIS-256298000.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long', 'vesselType'],
         "IHS-AIS-255915766.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long'],
         "combined_routes 1(in).csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long'],
         "combined_routes.csv": ['vesselId', 'timestamp', 'rumo', 'velocidade', 'lat', 'long']
@@ -21,6 +21,8 @@ def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=
     
     try:
         df = pd.read_csv(csv_file_path, header=None, names=column_names)
+        print("Valores únicos de vesselType:")
+        print(df['vesselType'].unique())
     except Exception as e:
         return jsonify({"error": f"Erro ao carregar o arquivo CSV: {str(e)}","coordinates":[]})
 
@@ -29,6 +31,12 @@ def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=
 
     if vessel_id:
         df = df[df['vesselId'] == vessel_id]
+    
+    if vessel_type:
+        if 'vesselType' in df.columns:
+            df = df[df['vesselType'] == vessel_type]
+        else:
+            return jsonify({"error": "Coluna 'vesselType' não encontrada no CSV.", "coordinates": []})
     
     if start_time and end_time: # filtra por intervalo de tempo
         try:
