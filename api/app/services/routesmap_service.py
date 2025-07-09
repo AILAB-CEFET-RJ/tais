@@ -15,6 +15,7 @@ def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=
 
     file_name = csv_file_path.split("/")[-1]
     column_names = column_names_mapping.get(file_name, [])
+    types = ['TUG', 'CARGO', 'TANKER', 'FISH', 'PASSENGER', 'YACHT', 'SAR', 'WIG', 'HSC', 'MIL']
 
     if not column_names:
         return jsonify({"error": f"Nome do arquivo '{file_name}' não encontrado no mapeamento de colunas.","coordinates":[]})
@@ -33,6 +34,8 @@ def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=
         df = df[df['vesselId'] == vessel_id]
     
     if vessel_type:
+        if vessel_type not in types:
+            return jsonify({"error": f"Tipo de embarcação inválido. Tipos válidos: {', '.join(types)}", "coordinates": []})
         if 'vesselType' in df.columns:
             df = df[df['vesselType'] == vessel_type]
         else:

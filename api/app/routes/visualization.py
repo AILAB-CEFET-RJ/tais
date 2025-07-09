@@ -18,7 +18,23 @@ visualization_bp = Blueprint("visualization", __name__)
 @visualization_bp.route("/", methods=["GET"])
 def view_routesmap() -> Response:
     # Obtém os dados do CSV
-    data = get_routesmap_from_csv().json
+    # data = get_routesmap_from_csv().json
+    # coordinates = list((tuple(c) for c in data["coordinates"]))
+    response = get_routesmap_from_csv()
+
+    # Se for uma tupla, separe response e status
+    if isinstance(response, tuple):
+        response, status_code = response
+    else:
+        status_code = response.status_code
+
+    if not response.is_json:
+        return Response("Erro: resposta inválida ou não-JSON", status=500)
+
+    data = response.get_json()
+    if not data or "coordinates" not in data:
+        return Response("Erro: dados de coordenadas ausentes", status=400)
+
     coordinates = list((tuple(c) for c in data["coordinates"]))
 
     if not coordinates:
