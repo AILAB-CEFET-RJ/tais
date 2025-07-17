@@ -22,8 +22,6 @@ def calculate_routesmap_data_from_csv(csv_file_path, vessel_id=None, start_time=
     
     try:
         df = pd.read_csv(csv_file_path, header=None, names=column_names)
-        print("Valores únicos de vesselType:")
-        print(df['vesselType'].unique())
     except Exception as e:
         return jsonify({"error": f"Erro ao carregar o arquivo CSV: {str(e)}","coordinates":[]})
 

@@ -61,6 +61,22 @@ Tool for analisys of AIS data
 
 - **Descrição**: Retorna os dados puros de rotas com base nos dados AIS disponíveis. Estes dados podem ser usados na construção de um mapa de rotas simplesmente para análise direta. Pode-se especificar o vesselId da embarcação, o tempo de início e o tempo final para análise.
 
+### 4. Dados do Mapa de Rotas ( GET )
+
+- **Rota**: /heatmap
+
+- **Exemplo**: <http://127.0.0.1:5000/heatmap>
+
+- **Descrição**: Permite a visualização de um mapa de calor baseado nos dados AIS disponíveis, tendo em consideração uma área delimitada por dois pares de coordenadas indicadas pelo usuário. Este mapa pode ser utilizado para identificar áreas de alta ou baixa densidade de tráfego marítimo.
+
+### 5. Dados do Mapa de Rotas ( GET )
+
+- **Rota**: ...?vesselType=...
+
+- **Exemplo**: <http://127.0.0.1:5000/visualization?vesselType=CARGO>
+
+- **Descrição**: Retorna a visualização de um mapa baseado nos dados AIS disponíveis filtrados por um tipo de embarcação específica.
+
 ## Formato de dados AIS utilizado no Tais
 
 A aplicação utiliza o formato JSON para representar as informações de rastreamento de embarcações em tempo real. Abaixo está a estrutura de dados AIS processada, que contém dados detalhados sobre a posição das embarcações, incluindo coordenadas geográficas, velocidade, rumo e outros parâmetros relevantes.
@@ -72,7 +88,8 @@ A aplicação utiliza o formato JSON para representar as informações de rastre
 2. ```routes/```: Contém os arquivos responsáveis pelas rotas da aplicação Flask, divididas por responsabilidade:
     **home.py**: Rota inicial e informações gerais da API.
     **routesmap.py**: Rotas relacionadas aos mapas de rota de embarcação.
-    **visualization.py**: Rotas para visualização dos dados
+    **heatmap.py**: Rotas, em um formato de mapa de calor, relacionadas aos mapas de rota de embarcação.
+    **visualization.py**: Rotas para visualização dos dados.
 
 3. ```services/```: Implementa a lógica da aplicação, separando as funcionalidades em serviços reutilizáveis:
     **routesmap_service.py**: Funções para cálculos de mapas de rotas.
